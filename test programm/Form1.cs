@@ -104,6 +104,7 @@ namespace test_programm
             fon.TabStop = false;
             fon.SendToBack();
 
+
             this.Controls.Add(fon);
 
             // логин
