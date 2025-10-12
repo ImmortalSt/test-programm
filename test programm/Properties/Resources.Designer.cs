@@ -59,5 +59,15 @@ namespace test_programm.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Comforter_Regular {
+            get {
+                object obj = ResourceManager.GetObject("Comforter-Regular", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }
