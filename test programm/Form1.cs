@@ -5,17 +5,16 @@ namespace test_programm
 {
     public partial class Form1 : Form
     {
-        private string fontPath = "fonts/Comforter-Regular.ttf";
-        private Font customFont;
-
         private PrivateFontCollection privateFonts = new PrivateFontCollection();
 
+        //установка шрифтов
         private void LoadCustomFont()
         {
             try
             {
                 // Способ 1: Загрузка из встроенных ресурсов проекта
                 byte[] fontData = Properties.Resources.Comforter_Regular; // "MyCustomFont" - имя ресурса
+                byte[] fontData2 = Properties.Resources.ofont_ru_LeoHand;
 
                 // Загружаем шрифт в память
                 IntPtr fontPtr = Marshal.AllocCoTaskMem(fontData.Length);
@@ -23,7 +22,12 @@ namespace test_programm
                 privateFonts.AddMemoryFont(fontPtr, fontData.Length);
                 Marshal.FreeCoTaskMem(fontPtr);
 
-                //MessageBox.Show($"Шрифт загружен: {privateFonts.Families[0].Name}");
+                // Загружаем второй шрифт
+                IntPtr fontPtr2 = Marshal.AllocCoTaskMem(fontData2.Length);
+                Marshal.Copy(fontData2, 0, fontPtr2, fontData2.Length);
+                privateFonts.AddMemoryFont(fontPtr2, fontData2.Length);
+                Marshal.FreeCoTaskMem(fontPtr2);
+
             }
             catch (Exception ex)
             {
@@ -47,8 +51,16 @@ namespace test_programm
             MainStr();
             RegisterStr();
             TestMain();
+            MainAdmin();
+            AllRatingStr();
+            SelectionTest();
+            AddTesting();
             OnOffRegisterStr(false);
             OnOffTestMain(false);
+            OnOffMainAdmin(false);
+            OnOffAllRatingStr(false);
+            OnOffSelectionTest(false);
+            OnOffAddTesting(false);
 
             this.Size = new Size(isForm, 900);
 
@@ -94,16 +106,6 @@ namespace test_programm
             isDragging = false;  // "ВЫКЛЮЧАЕМ РЕЖИМ ПЕРЕТАСКИВАНИЯ"
         }
 
-        Button Enter = new Button();        //вход
-        Button Exit = new Button();         //выход
-        Button Registr = new Button();      //регистрация
-        Button Recover = new Button();      //восстановить пароль
-
-        PictureBox fon = new PictureBox();
-        PictureBox login = new PictureBox();
-        PictureBox pass = new PictureBox();
-        PictureBox eye = new PictureBox();
-        Label nameTest = new Label();
 
         private void OnOffMainStr(bool isOn)
         {
@@ -126,6 +128,10 @@ namespace test_programm
             eye.Visible = isOn;
             nameTest.Enabled = isOn;
             nameTest.Visible = isOn;
+            nameStart.Enabled = isOn;
+            nameStart.Visible = isOn;
+            loginStart.Enabled = isOn;
+            loginStart.Visible = isOn;
         }
 
         private void OnOffRegisterStr(bool isOn)
@@ -170,7 +176,65 @@ namespace test_programm
             nameUser.Visible = isOn;
         }
 
+        private void OnOffMainAdmin(bool isOn)
+        {
+            AddTest.Enabled = isOn;
+            AddTest.Visible = isOn;
+            RedactedTest.Enabled = isOn;
+            RedactedTest.Visible = isOn;
+            DeleteTest.Enabled = isOn;
+            DeleteTest.Visible = isOn;
+            ReturnAdmin.Enabled = isOn;
+            ReturnAdmin.Visible = isOn;
+            ExitAdmin.Enabled = isOn;
+            ExitAdmin.Visible = isOn;
 
+            fonMenuAdmin.Enabled = isOn;
+            fonMenuAdmin.Visible = isOn;
+            MenuAdmin.Enabled = isOn;
+            MenuAdmin.Visible = isOn;
+            userAdmin.Enabled = isOn;
+            userAdmin.Visible = isOn;
+            nameUserAdmin.Enabled = isOn;
+            nameUserAdmin.Visible = isOn;
+        }
+
+        private void OnOffAllRatingStr(bool isOn)
+        {
+            ReturnAllRating.Enabled = isOn;
+            ReturnAllRating.Visible = isOn;
+
+            fonAllRating.Enabled = isOn;
+            fonAllRating.Visible = isOn;
+            userAllRating.Enabled = isOn;
+            userAllRating.Visible = isOn;
+            nameUserAllRating.Enabled = isOn;
+            nameUserAllRating.Visible = isOn;
+
+            lineHoriz.Enabled = isOn;
+            lineHoriz.Visible = isOn;
+            lineVert.Enabled = isOn;
+            lineVert.Visible = isOn;
+        }
+
+
+        PictureBox Enter = new PictureBox();        //вход
+        PictureBox Exit = new PictureBox();         //выход
+        PictureBox Registr = new PictureBox();      //регистрация
+        PictureBox Recover = new PictureBox();      //восстановить пароль
+
+        PictureBox fon = new PictureBox();
+        PictureBox login = new PictureBox();
+        PictureBox pass = new PictureBox();
+        PictureBox eye = new PictureBox();
+        Label nameTest = new Label();
+        TextBox nameStart = new TextBox();
+        Label loginStart = new Label();
+
+        [DllImport("user32.dll")]
+        static extern bool HideCaret(IntPtr hWnd);
+
+        //СТАРТОВАЯ СТРАНИЦА
         private void MainStr()
         {
             // название программы
@@ -206,6 +270,43 @@ namespace test_programm
 
             this.Controls.Add(login);
 
+            // ввод логина
+            nameStart.Text = "Логин";
+            nameStart.PlaceholderText = "Логин";
+            nameStart.Location = new Point(110, 220);
+            nameStart.Name = "nameStart";
+            nameStart.Size = new Size(415, 40);
+            nameStart.Font = new Font(privateFonts.Families[1], 20, FontStyle.Bold);
+            nameStart.BackColor = Color.FromArgb(104, 201, 190); // установка цвета
+            nameStart.BorderStyle = BorderStyle.None;   // Убираем рамку
+            nameStart.ForeColor = Color.Gray;           // Цвет подсказки
+            nameStart.BringToFront();
+
+            this.Controls.Add(nameStart);
+            this.Controls.SetChildIndex(nameStart, 0);
+
+            // Очищаем текст при фокусировке
+            nameStart.GotFocus += (sender, e) =>
+            {
+                if (nameStart.Text == "Логин")
+                {
+                    nameStart.Text = "";
+                    nameStart.ForeColor = Color.Black;
+                    HideCaret(nameStart.Handle); // Скрыть курсор
+                }
+            };
+
+            // Возвращаем подсказку, если поле пустое
+            nameStart.LostFocus += (sender, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(nameStart.Text))
+                {
+                    nameStart.Text = "Логин";
+                    nameStart.ForeColor = Color.Gray;
+                }
+            };
+
+
             // пароль
             pass.Image = Image.FromFile("object/entry_cell.png");
             pass.Location = new Point(76, 293 + 20);
@@ -232,67 +333,111 @@ namespace test_programm
             Enter.Location = new Point(144, 426);
             Enter.Name = "Enter";
             Enter.Size = new Size(305 + 20, 74 + 20);
-            Enter.FlatAppearance.BorderSize = 0;
-            Enter.FlatStyle = FlatStyle.Flat;
             Enter.TabIndex = 0;
             Enter.Image = Image.FromFile("button/Enter.png");
-            Enter.UseVisualStyleBackColor = true;
 
             this.Controls.Add(Enter);
 
-            Registr.Click += (sender, e) =>
+            // Добавление эффектов наведения
+            Enter.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                Enter.Image = Image.FromFile("button/EnterColor.png");
+            };
+
+            Enter.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                Enter.Image = Image.FromFile("button/Enter.png");
+            };
+
+            Enter.Click += (sender, e) =>
             {
                 OnOffMainStr(false);
                 OnOffTestMain(true);
-
+                nameStart.Clear();
             };
 
             // кнопка РЕГИСТРАЦИЯ
             Registr.Location = new Point(144, 540);
             Registr.Name = "Registr";
             Registr.Size = new Size(305 + 20, 74 + 20);
-            Registr.FlatAppearance.BorderSize = 0;
-            Registr.FlatStyle = FlatStyle.Flat;
             Registr.TabIndex = 0;
             Registr.Image = Image.FromFile("button/Register.png");
-            Registr.UseVisualStyleBackColor = true;
 
             this.Controls.Add(Registr);
+
+            // Добавление эффектов наведения
+            Registr.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                Registr.Image = Image.FromFile("button/RegisterColor.png");
+            };
+
+            Registr.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                Registr.Image = Image.FromFile("button/Register.png");
+            };
+
             Registr.Click += (sender, e) =>
             {
                 OnOffMainStr(false);
                 OnOffRegisterStr(true);
             };
 
+
+
             // кнопка ВОССТАНОВИТЬ
             Recover.Location = new Point(144, 652);
             Recover.Name = "Recover";
             Recover.Size = new Size(305 + 20, 74 + 20);
-            Recover.FlatAppearance.BorderSize = 0;
-            Recover.FlatStyle = FlatStyle.Flat;
             Recover.TabIndex = 0;
             Recover.Image = Image.FromFile("button/Recover.png");
-            Recover.UseVisualStyleBackColor = true;
 
             this.Controls.Add(Recover);
+
+            // Добавление эффектов наведения
+            Recover.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                Recover.Image = Image.FromFile("button/RecoverColor.png");
+            };
+
+            Recover.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                Recover.Image = Image.FromFile("button/Recover.png");
+            };
 
             // кнопка ВЫХОД
             Exit.Location = new Point(144, 757);
             Exit.Name = "Exit";
             Exit.Size = new Size(305 + 20, 74 + 20);
-            Exit.FlatAppearance.BorderSize = 0;
-            Exit.FlatStyle = FlatStyle.Flat;
             Exit.TabIndex = 0;
             Exit.Image = Image.FromFile("button/Exit.png");
-            Exit.UseVisualStyleBackColor = true;
 
             this.Controls.Add(Exit);
+
+            // Добавление эффектов наведения
+            Exit.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                Exit.Image = Image.FromFile("button/ExitColor.png");
+            };
+
+            Exit.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                Exit.Image = Image.FromFile("button/Exit.png");
+            };
+
             Exit.Click += (sender, e) => { this.Close(); }; //обработчик события Click
 
         }
 
-        Button AddReg = new Button();        //Создать
-        Button ReturnReg = new Button();     //Назад в окне РЕГИСТРАЦИЯ
+        PictureBox AddReg = new PictureBox();        //Создать
+        PictureBox ReturnReg = new PictureBox();     //Назад в окне РЕГИСТРАЦИЯ
 
         PictureBox fonRegistr = new PictureBox();
         PictureBox nameReg = new PictureBox();
@@ -361,25 +506,46 @@ namespace test_programm
             AddReg.Location = new Point(128, 650);
             AddReg.Name = "Enter";
             AddReg.Size = new Size(357 + 20, 75 + 20);
-            AddReg.FlatAppearance.BorderSize = 0;
-            AddReg.FlatStyle = FlatStyle.Flat;
             AddReg.TabIndex = 0;
             AddReg.Image = Image.FromFile("button/Registration.png");
-            AddReg.UseVisualStyleBackColor = true;
 
             this.Controls.Add(AddReg);
+
+            // Добавление эффектов наведения
+            AddReg.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                AddReg.Image = Image.FromFile("button/RegistrationColor.png");
+            };
+
+            AddReg.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                AddReg.Image = Image.FromFile("button/Registration.png");
+            };
 
             // кнопка НАЗАД
             ReturnReg.Location = new Point(128, 760);
             ReturnReg.Name = "ReturnReg";
             ReturnReg.Size = new Size(357 + 20, 75 + 20);
-            ReturnReg.FlatAppearance.BorderSize = 0;
-            ReturnReg.FlatStyle = FlatStyle.Flat;
             ReturnReg.TabIndex = 0;
             ReturnReg.Image = Image.FromFile("button/ReturnReg.png");
-            ReturnReg.UseVisualStyleBackColor = true;
 
             this.Controls.Add(ReturnReg);
+
+            // Добавление эффектов наведения
+            ReturnReg.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ReturnReg.Image = Image.FromFile("button/ReturnRegColor.png");
+            };
+
+            ReturnReg.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ReturnReg.Image = Image.FromFile("button/ReturnReg.png");
+            };
+
             ReturnReg.Click += (sender, e) =>
             {
                 OnOffRegisterStr(false);
@@ -388,17 +554,18 @@ namespace test_programm
 
         }
 
-        Button TEST = new Button();          //список тестов
-        Button OtherUser = new Button();     //сменить пользователя
-        Button AllRating = new Button();     //рейтинг всех пользователей
-        Button MyRating = new Button();      //мой рейтинг
-        Button Administrator = new Button(); //администрирование
-        Button ExitTest = new Button();
+
+        // главная страница программы
+        PictureBox TEST = new PictureBox();          //список тестов
+        PictureBox OtherUser = new PictureBox();     //сменить пользователя
+        PictureBox AllRating = new PictureBox();     //рейтинг всех пользователей
+        PictureBox MyRating = new PictureBox();      //мой рейтинг
+        PictureBox Administrator = new PictureBox(); //администрирование
+        PictureBox ExitTest = new PictureBox();
 
         PictureBox fonTest = new PictureBox();
         Label user = new Label();
         Label nameUser = new Label();
-
 
         private void TestMain()
         {
@@ -421,6 +588,9 @@ namespace test_programm
 
             this.Controls.Add(nameUser);
 
+            this.Controls.SetChildIndex(user, 0);
+            this.Controls.SetChildIndex(nameUser, 0);
+
             // фон test
             fonTest.Image = Image.FromFile("img/fonTestMain.png");
             fonTest.Location = new Point(0, 30);
@@ -441,36 +611,63 @@ namespace test_programm
                     g.DrawString("Тестирующая программа", font, Brushes.Black, new PointF(350, 0));
                 }
             }
-            fon.Invalidate(); // Обновляем PictureBox, чтобы изменения отобразились
+            fonTest.Invalidate(); // Обновляем PictureBox, чтобы изменения отобразились
 
             // кнопка TEST
             TEST.Location = new Point(411, 170);
             TEST.Name = "TEST";
             TEST.Size = new Size(305 + 20, 52 + 20);
             TEST.BackColor = Color.FromArgb(252, 243, 224); // установка цвета
-            TEST.FlatAppearance.BorderSize = 0;
-            TEST.FlatStyle = FlatStyle.Flat;
             TEST.TabIndex = 0;
             TEST.Image = Image.FromFile("button/Test.png");
-            TEST.UseVisualStyleBackColor = true;
 
             this.Controls.Add(TEST);
             TEST.BringToFront();
+
+            // Добавление эффектов наведения
+            TEST.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                TEST.Image = Image.FromFile("button/TestColor.png");
+            };
+
+            TEST.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                TEST.Image = Image.FromFile("button/Test.png");
+            };
+
+            TEST.Click += (sender, e) =>
+             {
+                 OnOffTestMain(false);
+                 OnOffSelectionTest(true);
+             };
 
             // кнопка СМЕНИТЬ ПОЛЬЗОВАТЕЛЯ
             OtherUser.Location = new Point(617, 260);
             OtherUser.Name = "OtherUser";
             OtherUser.Size = new Size(305 + 20, 74 + 20);
             OtherUser.BackColor = Color.FromArgb(252, 243, 224); // установка цвета
-            OtherUser.FlatAppearance.BorderSize = 0;
-            OtherUser.FlatStyle = FlatStyle.Flat;
             OtherUser.TabIndex = 0;
             OtherUser.Image = Image.FromFile("button/OtherUser.png");
-            OtherUser.UseVisualStyleBackColor = true;
 
             this.Controls.Add(OtherUser);
             OtherUser.BringToFront();
-            Registr.Click += (sender, e) =>
+
+            // Добавление эффектов наведения
+            OtherUser.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                OtherUser.Image = Image.FromFile("button/OtherUserColor.png");
+            };
+
+            OtherUser.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                OtherUser.Image = Image.FromFile("button/OtherUser.png");
+            };
+
+            OtherUser.Click += (sender, e) =>
             {
                 OnOffTestMain(false);
                 OnOffMainStr(true);
@@ -481,15 +678,26 @@ namespace test_programm
             ExitTest.Location = new Point(617, 360);
             ExitTest.Name = "ExitTest";
             ExitTest.Size = new Size(305 + 20, 74 + 20);
-            ExitTest.FlatAppearance.BorderSize = 0;
             ExitTest.BackColor = Color.FromArgb(252, 243, 224); // установка цвета
-            ExitTest.FlatStyle = FlatStyle.Flat;
             ExitTest.TabIndex = 0;
             ExitTest.Image = Image.FromFile("button/ExitTestMain.png");
-            ExitTest.UseVisualStyleBackColor = true;
 
             this.Controls.Add(ExitTest);
             ExitTest.BringToFront();
+
+            // Добавление эффектов наведения
+            ExitTest.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ExitTest.Image = Image.FromFile("button/ExitTestMainColor.png");
+            };
+
+            ExitTest.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ExitTest.Image = Image.FromFile("button/ExitTestMain.png");
+            };
+
             ExitTest.Click += (sender, e) => { this.Close(); }; //обработчик события Click
 
             // кнопка Admin
@@ -497,42 +705,999 @@ namespace test_programm
             Administrator.Name = "Admin";
             Administrator.Size = new Size(305 + 20, 52 + 20);
             Administrator.BackColor = Color.FromArgb(252, 243, 224); // установка цвета
-            Administrator.FlatAppearance.BorderSize = 0;
-            Administrator.FlatStyle = FlatStyle.Flat;
             Administrator.TabIndex = 0;
             Administrator.Image = Image.FromFile("button/Admin.png");
-            Administrator.UseVisualStyleBackColor = true;
 
             this.Controls.Add(Administrator);
             Administrator.BringToFront();
+
+            // Добавление эффектов наведения
+            Administrator.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                Administrator.Image = Image.FromFile("button/AdminColor.png");
+            };
+
+            Administrator.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                Administrator.Image = Image.FromFile("button/Admin.png");
+            };
+
+            Administrator.Click += (sender, e) =>
+            {
+                OnOffMainAdmin(true);
+                OnOffTestMain(false);
+            };
 
             // кнопка MyRating
             MyRating.Location = new Point(430, 454);
             MyRating.Name = "MyRating";
             MyRating.Size = new Size(305 + 20, 52 + 20);
             MyRating.BackColor = Color.FromArgb(252, 243, 224); // установка цвета
-            MyRating.FlatAppearance.BorderSize = 0;
-            MyRating.FlatStyle = FlatStyle.Flat;
             MyRating.TabIndex = 0;
             MyRating.Image = Image.FromFile("button/MyRating.png");
-            MyRating.UseVisualStyleBackColor = true;
 
             this.Controls.Add(MyRating);
             MyRating.BringToFront();
+
+            // Добавление эффектов наведения
+            MyRating.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                MyRating.Image = Image.FromFile("button/MyRatingColor.png");
+            };
+
+            MyRating.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                MyRating.Image = Image.FromFile("button/MyRating.png");
+            };
 
             // кнопка Rating
             AllRating.Location = new Point(697, 792);
             AllRating.Name = "Rating";
             AllRating.Size = new Size(305 + 20, 52 + 20);
             AllRating.BackColor = Color.FromArgb(252, 243, 224); // установка цвета
-            AllRating.FlatAppearance.BorderSize = 0;
-            AllRating.FlatStyle = FlatStyle.Flat;
             AllRating.TabIndex = 0;
             AllRating.Image = Image.FromFile("button/AllRating.png");
-            AllRating.UseVisualStyleBackColor = true;
 
             this.Controls.Add(AllRating);
             AllRating.BringToFront();
+
+            // Добавление эффектов наведения
+            AllRating.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                AllRating.Image = Image.FromFile("button/AllRatingColor.png");
+            };
+
+            AllRating.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                AllRating.Image = Image.FromFile("button/AllRating.png");
+            };
+
+            AllRating.Click += (sender, e) =>
+            {
+                OnOffTestMain(false);
+                OnOffAllRatingStr(true);
+            };
+
+
+        }
+
+        // раздел АДМИНИСТРАТОРА
+        PictureBox AddTest = new PictureBox();           //добавить тест
+        PictureBox RedactedTest = new PictureBox();      //редактировать тест
+        PictureBox DeleteTest = new PictureBox();        //удалить тест
+        PictureBox ReturnAdmin = new PictureBox();       //возврат в главную теста
+        PictureBox ExitAdmin = new PictureBox();
+
+        PictureBox MenuAdmin = new PictureBox();
+        PictureBox fonMenuAdmin = new PictureBox();
+        Label userAdmin = new Label();
+        Label nameUserAdmin = new Label();
+
+        private void MainAdmin()
+        {
+            //user
+            userAdmin.Text = "User";
+            userAdmin.Location = new Point(0, 20);
+            userAdmin.Name = "userAdmin";
+            userAdmin.AutoSize = true;
+            userAdmin.Font = new Font(privateFonts.Families[0], 24, FontStyle.Bold); ;
+            userAdmin.BringToFront();
+
+            this.Controls.Add(userAdmin);
+
+            nameUserAdmin.Text = "...";
+            nameUserAdmin.Location = new Point(70, 20);
+            nameUserAdmin.Name = "userNameAdmin";
+            nameUserAdmin.AutoSize = true;
+            nameUserAdmin.Font = new Font(privateFonts.Families[0], 24, FontStyle.Bold); ;
+            nameUserAdmin.BringToFront();
+
+            this.Controls.Add(nameUserAdmin);
+
+            fonMenuAdmin.Image = Image.FromFile("img/fonMenuAdmin.png");
+            fonMenuAdmin.Location = new Point(0, 30);
+            fonMenuAdmin.Name = "fonMenuAdmin";
+            fonMenuAdmin.Size = new Size(1600, 875);
+            fonMenuAdmin.SizeMode = PictureBoxSizeMode.Zoom;
+            fonMenuAdmin.TabIndex = 0;
+            fonMenuAdmin.TabStop = false;
+            fonMenuAdmin.SendToBack();
+
+            this.Controls.Add(fonMenuAdmin);
+
+            MenuAdmin.Image = Image.FromFile("img/MenuAdmin.png");
+            MenuAdmin.Location = new Point(260, 140);
+            MenuAdmin.Name = "MenuAdmin";
+            MenuAdmin.Size = new Size(1052, 613);
+            MenuAdmin.SizeMode = PictureBoxSizeMode.Zoom;
+            MenuAdmin.TabIndex = 0;
+            MenuAdmin.TabStop = false;
+            MenuAdmin.BringToFront();
+
+            this.Controls.Add(MenuAdmin);
+
+            // Рисование текста поверх PictureBox
+            using (Graphics g = Graphics.FromImage(MenuAdmin.Image))
+            {
+                using (Font font = new Font(privateFonts.Families[0], 96, FontStyle.Bold))
+                {
+                    g.DrawString("Меню Админа", font, Brushes.Black, new PointF(170, 0));
+                }
+            }
+            MenuAdmin.Invalidate(); // Обновляем PictureBox, чтобы изменения отобразились
+
+            this.Controls.SetChildIndex(fonMenuAdmin, 1000);
+            this.Controls.SetChildIndex(MenuAdmin, 0);
+
+            // кнопка AddTest
+            AddTest.Location = new Point(958, 193);
+            AddTest.Name = "AddTest";
+            AddTest.Size = new Size(305 + 20, 71 + 20);
+            AddTest.BackColor = Color.FromArgb(49, 136, 242); // установка цвета
+            AddTest.TabIndex = 0;
+            AddTest.Image = Image.FromFile("button/AddTest.png");
+
+            this.Controls.Add(AddTest);
+            AddTest.BringToFront();
+
+            // Добавление эффектов наведения
+            AddTest.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                AddTest.Image = Image.FromFile("button/AddColor.png");
+            };
+
+            AddTest.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                AddTest.Image = Image.FromFile("button/AddTest.png");
+            };
+
+            AddTest.Click += (sender, e) =>
+            {
+                OnOffMainAdmin(false);
+                OnOffAddTesting(true);
+            };
+
+
+            // кнопка RedactedTest
+            RedactedTest.Location = new Point(958, 290);
+            RedactedTest.Name = "RedactedTest";
+            RedactedTest.Size = new Size(305 + 20, 71 + 20);
+            RedactedTest.BackColor = Color.FromArgb(49, 136, 242); // установка цвета
+            RedactedTest.TabIndex = 0;
+            RedactedTest.Image = Image.FromFile("button/Redaction.png");
+
+            this.Controls.Add(RedactedTest);
+            RedactedTest.BringToFront();
+
+            // Добавление эффектов наведения
+            RedactedTest.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                RedactedTest.Image = Image.FromFile("button/RedactionColor.png");
+            };
+
+            RedactedTest.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                RedactedTest.Image = Image.FromFile("button/Redaction.png");
+            };
+
+            // кнопка DeleteTest
+            DeleteTest.Location = new Point(958, 390);
+            DeleteTest.Name = "DeleteTest";
+            DeleteTest.Size = new Size(305 + 20, 71 + 20);
+            DeleteTest.BackColor = Color.FromArgb(49, 136, 242); // установка цвета
+            DeleteTest.TabIndex = 0;
+            DeleteTest.Image = Image.FromFile("button/DeleteTest.png");
+
+            this.Controls.Add(DeleteTest);
+            DeleteTest.BringToFront();
+
+            // Добавление эффектов наведения
+            DeleteTest.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                DeleteTest.Image = Image.FromFile("button/DeleteColor.png");
+            };
+
+            DeleteTest.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                DeleteTest.Image = Image.FromFile("button/DeleteTest.png");
+            };
+
+
+            // кнопка Return
+            ReturnAdmin.Location = new Point(958, 497);
+            ReturnAdmin.Name = "Admin";
+            ReturnAdmin.Size = new Size(305 + 20, 71 + 20);
+            ReturnAdmin.BackColor = Color.FromArgb(49, 136, 242); // установка цвета
+            ReturnAdmin.TabIndex = 0;
+            ReturnAdmin.Image = Image.FromFile("button/Return.png");
+
+            this.Controls.Add(ReturnAdmin);
+            ReturnAdmin.BringToFront();
+
+            // Добавление эффектов наведения
+            ReturnAdmin.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ReturnAdmin.Image = Image.FromFile("button/ReturnColor.png");
+            };
+
+            ReturnAdmin.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ReturnAdmin.Image = Image.FromFile("button/Return.png");
+            };
+
+            ReturnAdmin.Click += (sender, e) =>
+            {
+                OnOffMainAdmin(false);
+                OnOffTestMain(true);
+            };
+
+            // кнопка ВЫХОД
+            ExitAdmin.Location = new Point(958, 642);
+            ExitAdmin.Name = "ExitTest";
+            ExitAdmin.Size = new Size(305 + 20, 71 + 20);
+            ExitAdmin.BackColor = Color.FromArgb(49, 136, 242); // установка цвета
+            ExitAdmin.TabIndex = 0;
+            ExitAdmin.Image = Image.FromFile("button/ExitTestMain.png");
+
+            this.Controls.Add(ExitAdmin);
+            ExitAdmin.BringToFront();
+
+            // Добавление эффектов наведения
+            ExitAdmin.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ExitAdmin.Image = Image.FromFile("button/ExitTestMainColor.png");
+            };
+
+            ExitAdmin.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ExitAdmin.Image = Image.FromFile("button/ExitTestMain.png");
+            };
+
+            ExitAdmin.Click += (sender, e) => { this.Close(); }; //обработчик события Click         
+
+        }
+
+        // Добавить тест
+        PictureBox ButtonAddThema = new PictureBox();           //добавить тему
+        PictureBox ButtonPictureThema = new PictureBox();       //добавить картинку к теме
+        PictureBox ButtonAddQuestion = new PictureBox();        //добавить вопрос
+        PictureBox ButtonAddAnswers = new PictureBox();         //добаить варианты ответов
+        PictureBox ButtonAddRAnswers = new PictureBox();        //добавить варианты правильных ответов
+        PictureBox ButtonMenuAdminAdd = new PictureBox();       //кнопка возврата в меню админа
+        PictureBox ButtonReturnAdd = new PictureBox();          //кнопка возврата в главное меню программы
+        PictureBox ButtonExitAdd = new PictureBox();            //кнопка выход из программы
+
+        PictureBox AddThema = new PictureBox();                 //тема
+        PictureBox AddQuestion = new PictureBox();              //вопрос
+        PictureBox AddAnswer1 = new PictureBox();               //добавить вариант ответа 1
+        PictureBox AddAnswer2 = new PictureBox();               //добавить вариант ответа 2
+        PictureBox AddAnswer3 = new PictureBox();               //добавить вариант ответа 3
+        PictureBox AddRAnswer1 = new PictureBox();              //добавить вариант правильного ответа 1
+        PictureBox AddRAnswer2 = new PictureBox();              //добаить варинат правильного ответа 2
+
+        PictureBox fonAddAdmin = new PictureBox();
+        Label userAddAdmin = new Label();
+        Label nameUserAddAdmin = new Label();
+
+        // включение страницы ДОБАВИТЬ ТЕСТ
+        private void OnOffAddTesting(bool isOn)
+        {
+            ButtonAddThema.Enabled = isOn; ButtonAddThema.Visible = isOn;
+            ButtonPictureThema.Enabled = isOn; ButtonPictureThema.Visible = isOn;
+            ButtonAddQuestion.Enabled = isOn; ButtonAddQuestion.Visible = isOn;
+            ButtonAddAnswers.Enabled = isOn; ButtonAddAnswers.Visible = isOn;
+            ButtonAddRAnswers.Enabled = isOn; ButtonAddRAnswers.Visible = isOn;
+            ButtonMenuAdminAdd.Enabled = isOn; ButtonMenuAdminAdd.Visible = isOn;
+            ButtonReturnAdd.Enabled = isOn; ButtonReturnAdd.Visible = isOn;
+            ButtonExitAdd.Enabled = isOn; ButtonExitAdd.Visible = isOn;
+
+            AddThema.Enabled = isOn; AddThema.Visible = isOn;
+            AddQuestion.Enabled = isOn; AddQuestion.Visible = isOn;
+            AddAnswer1.Enabled = isOn; AddAnswer1.Visible = isOn;
+            AddAnswer2.Enabled = isOn; AddAnswer2.Visible = isOn;
+            AddAnswer3.Enabled = isOn; AddAnswer3.Visible = isOn;
+            AddRAnswer1.Enabled = isOn; AddRAnswer1.Visible = isOn;
+            AddRAnswer2.Enabled = isOn; AddRAnswer2.Visible = isOn;
+
+            fonAddAdmin.Enabled = isOn; fonAddAdmin.Visible = isOn;
+            userAddAdmin.Enabled = isOn; userAddAdmin.Visible = isOn;
+            nameUserAddAdmin.Enabled = isOn; nameUserAddAdmin.Visible = isOn;
+        }
+
+        private void AddTesting()
+        {
+            //user
+            userAddAdmin.Text = "User";
+            userAddAdmin.Location = new Point(0, 20);
+            userAddAdmin.Name = "userAddAdmin";
+            userAddAdmin.AutoSize = true;
+            userAddAdmin.Font = new Font(privateFonts.Families[0], 24, FontStyle.Bold);
+            userAddAdmin.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+
+            this.Controls.Add(userAddAdmin);
+
+            nameUserAddAdmin.Text = "...";
+            nameUserAddAdmin.Location = new Point(70, 20);
+            nameUserAddAdmin.Name = "nameUserAddAdmin";
+            nameUserAddAdmin.AutoSize = true;
+            nameUserAddAdmin.Font = new Font(privateFonts.Families[0], 24, FontStyle.Bold);
+            nameUserAddAdmin.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+
+            this.Controls.Add(nameUserAddAdmin);
+
+            this.Controls.SetChildIndex(userAddAdmin, 0);
+            this.Controls.SetChildIndex(nameUserAddAdmin, 0);
+
+            //фон AddAdmin
+            fonAddAdmin.Image = Image.FromFile("img/fonAddTest.png");
+            fonAddAdmin.Location = new Point(0, 20);
+            fonAddAdmin.Name = "fonAddAdmin";
+            fonAddAdmin.Size = new Size(1600, 900);
+            fonAddAdmin.SizeMode = PictureBoxSizeMode.Zoom;
+            fonAddAdmin.TabIndex = 0;
+            fonAddAdmin.TabStop = false;
+            fonAddAdmin.SendToBack();
+
+            this.Controls.Add(fonAddAdmin);
+            this.Controls.SetChildIndex(fonAddAdmin, 1000);
+
+            using (Graphics g = Graphics.FromImage(fonAddAdmin.Image))
+            {
+                using (Font font = new Font(privateFonts.Families[0], 96, FontStyle.Bold))
+                {
+                    g.DrawString("Добавить тест", font, Brushes.Black, new PointF(350, 0));
+                }
+            }
+            fonAddAdmin.Invalidate(); // Обновляем PictureBox, чтобы изменения отобразились
+
+            // Add Thema
+            AddThema.Location = new Point(42, 145);
+            AddThema.Name = "AddThema";
+            AddThema.Size = new Size(593 + 20, 60 + 20);
+            AddThema.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            AddThema.TabIndex = 0;
+            AddThema.Image = Image.FromFile("object/AddThema.png");
+
+            this.Controls.Add(AddThema);
+            AddThema.BringToFront();
+
+            // Add Question
+            AddQuestion.Location = new Point(42, 255);
+            AddQuestion.Name = "AddQuestion";
+            AddQuestion.Size = new Size(593 + 20, 229 + 20);
+            AddQuestion.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            AddQuestion.TabIndex = 0;
+            AddQuestion.Image = Image.FromFile("object/AddQuestion.png");
+
+            this.Controls.Add(AddQuestion);
+            AddQuestion.BringToFront();
+
+            // Add Answer
+            AddAnswer1.Location = new Point(42, 590);
+            AddAnswer1.Name = "AddAnswer1";
+            AddAnswer1.Size = new Size(458 + 20, 67 + 20);
+            AddAnswer1.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            AddAnswer1.TabIndex = 0;
+            AddAnswer1.Image = Image.FromFile("object/AddAnswer.png");
+
+            this.Controls.Add(AddAnswer1);
+            AddAnswer1.BringToFront();
+
+            AddAnswer2.Location = new Point(42, 690);
+            AddAnswer2.Name = "AddAnswer2";
+            AddAnswer2.Size = new Size(458 + 20, 67 + 20);
+            AddAnswer2.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            AddAnswer2.TabIndex = 0;
+            AddAnswer2.Image = Image.FromFile("object/AddAnswer.png");
+
+            this.Controls.Add(AddAnswer2);
+            AddAnswer2.BringToFront();
+
+            AddAnswer3.Location = new Point(42, 790);
+            AddAnswer3.Name = "AddAnswer3";
+            AddAnswer3.Size = new Size(458 + 20, 67 + 20);
+            AddAnswer3.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            AddAnswer3.TabIndex = 0;
+            AddAnswer3.Image = Image.FromFile("object/AddAnswer.png");
+
+            this.Controls.Add(AddAnswer3);
+            AddAnswer3.BringToFront();
+
+            // Add Right Answer
+            AddRAnswer1.Location = new Point(558, 590);
+            AddRAnswer1.Name = "AddRAnswer1";
+            AddRAnswer1.Size = new Size(458 + 20, 67 + 20);
+            AddRAnswer1.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            AddRAnswer1.TabIndex = 0;
+            AddRAnswer1.Image = Image.FromFile("object/AddAnswer.png");
+
+            this.Controls.Add(AddRAnswer1);
+            AddRAnswer1.BringToFront();
+
+            AddRAnswer2.Location = new Point(558, 690);
+            AddRAnswer2.Name = "AddRAnswer2";
+            AddRAnswer2.Size = new Size(458 + 20, 67 + 20);
+            AddRAnswer2.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            AddRAnswer2.TabIndex = 0;
+            AddRAnswer2.Image = Image.FromFile("object/AddAnswer.png");
+
+            this.Controls.Add(AddRAnswer2);
+            AddRAnswer2.BringToFront();
+
+            // кнопка ДОБАВИТЬ ТЕМУ
+            ButtonAddThema.Location = new Point(671, 145);
+            ButtonAddThema.Name = "ButtonAddThema";
+            ButtonAddThema.Size = new Size(258 + 20, 58 + 20);
+            ButtonAddThema.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            ButtonAddThema.TabIndex = 0;
+            ButtonAddThema.Image = Image.FromFile("button/AddThema.png");
+
+            this.Controls.Add(ButtonAddThema);
+            ButtonAddThema.BringToFront();
+
+            // Добавление эффектов наведения
+            ButtonAddThema.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ButtonAddThema.Image = Image.FromFile("button/AddThemaColor.png");
+            };
+
+            ButtonAddThema.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ButtonAddThema.Image = Image.FromFile("button/AddThema.png");
+            };
+
+            ButtonAddThema.Click += (sender, e) =>
+            {
+                // добавить в базу данных
+            };
+
+            // кнопка ДОБАВИТЬ картинку к теме
+            ButtonPictureThema.Location = new Point(960, 145);
+            ButtonPictureThema.Name = "ButtonPictureThema";
+            ButtonPictureThema.Size = new Size(258 + 20, 58 + 20);
+            ButtonPictureThema.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            ButtonPictureThema.TabIndex = 0;
+            ButtonPictureThema.Image = Image.FromFile("object/imgThema.png");
+
+            this.Controls.Add(ButtonPictureThema);
+            ButtonPictureThema.BringToFront();
+
+            ButtonPictureThema.Click += (sender, e) =>
+            {
+                // добавить в картинку к теме
+            };
+
+            // кнопка ДОБАВИТЬ вопрос
+            ButtonAddQuestion.Location = new Point(680, 275);
+            ButtonAddQuestion.Name = "ButtonAddQuestion";
+            ButtonAddQuestion.Size = new Size(258 + 20, 58 + 20);
+            ButtonAddQuestion.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            ButtonAddQuestion.TabIndex = 0;
+            ButtonAddQuestion.Image = Image.FromFile("button/AddQuest.png");
+
+            this.Controls.Add(ButtonAddQuestion);
+            ButtonAddQuestion.BringToFront();
+
+            // Добавление эффектов наведения
+            ButtonAddQuestion.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ButtonAddQuestion.Image = Image.FromFile("button/AddQuestColor.png");
+            };
+
+            ButtonAddQuestion.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ButtonAddQuestion.Image = Image.FromFile("button/AddQuest.png");
+            };
+
+            ButtonAddQuestion.Click += (sender, e) =>
+            {
+                // добавить в вопрос в БД
+            };
+
+            // кнопка ДОБАВИТЬ вариант ответов в БД
+            ButtonAddAnswers.Location = new Point(155, 510);
+            ButtonAddAnswers.Name = "ButtonAddAnswers";
+            ButtonAddAnswers.Size = new Size(258 + 20, 58 + 20);
+            ButtonAddAnswers.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            ButtonAddAnswers.TabIndex = 0;
+            ButtonAddAnswers.Image = Image.FromFile("button/AddAnswer.png");
+
+            this.Controls.Add(ButtonAddAnswers);
+            ButtonAddAnswers.BringToFront();
+
+            // Добавление эффектов наведения
+            ButtonAddAnswers.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ButtonAddAnswers.Image = Image.FromFile("button/AddAnswerColor.png");
+            };
+
+            ButtonAddAnswers.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ButtonAddAnswers.Image = Image.FromFile("button/AddAnswer.png");
+            };
+
+            ButtonAddAnswers.Click += (sender, e) =>
+            {
+                // добавить в варианты ответов в БД
+            };
+
+            // кнопка ДОБАВИТЬ варианты правильных ответов в БД
+            ButtonAddRAnswers.Location = new Point(655, 510);
+            ButtonAddRAnswers.Name = "ButtonAddRAnswers";
+            ButtonAddRAnswers.Size = new Size(258 + 20, 58 + 20);
+            ButtonAddRAnswers.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            ButtonAddRAnswers.TabIndex = 0;
+            ButtonAddRAnswers.Image = Image.FromFile("button/AddRAnsw.png");
+
+            this.Controls.Add(ButtonAddRAnswers);
+            ButtonAddRAnswers.BringToFront();
+
+            // Добавление эффектов наведения
+            ButtonAddRAnswers.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ButtonAddRAnswers.Image = Image.FromFile("button/AddRAnswColor.png");
+            };
+
+            ButtonAddRAnswers.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ButtonAddRAnswers.Image = Image.FromFile("button/AddRAnsw.png");
+            };
+
+            ButtonAddRAnswers.Click += (sender, e) =>
+            {
+                // добавить в варианты правильных ответов в БД
+            };
+
+
+            // кнопка ButtonMenuAdminAdd
+            ButtonMenuAdminAdd.Location = new Point(1174, 598);
+            ButtonMenuAdminAdd.Name = "ButtonMenuAdminAdd";
+            ButtonMenuAdminAdd.Size = new Size(305 + 20, 71 + 20);
+            ButtonMenuAdminAdd.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            ButtonMenuAdminAdd.TabIndex = 0;
+            ButtonMenuAdminAdd.Image = Image.FromFile("button/Menu.png");
+
+            this.Controls.Add(ButtonMenuAdminAdd);
+            ButtonMenuAdminAdd.BringToFront();
+
+            // Добавление эффектов наведения
+            ButtonMenuAdminAdd.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ButtonMenuAdminAdd.Image = Image.FromFile("button/MenuAdminColor.png");
+            };
+
+            ButtonMenuAdminAdd.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ButtonMenuAdminAdd.Image = Image.FromFile("button/Menu.png");
+            };
+
+            ButtonMenuAdminAdd.Click += (sender, e) =>
+            {
+                OnOffAddTesting(false);
+                OnOffMainAdmin(true);
+            };
+
+            // кнопка Return
+            ButtonReturnAdd.Location = new Point(1174, 701);
+            ButtonReturnAdd.Name = "ButtonReturnAdd";
+            ButtonReturnAdd.Size = new Size(305 + 20, 71 + 20);
+            ButtonReturnAdd.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            ButtonReturnAdd.TabIndex = 0;
+            ButtonReturnAdd.Image = Image.FromFile("button/Return.png");
+
+            this.Controls.Add(ButtonReturnAdd);
+            ButtonReturnAdd.BringToFront();
+
+            // Добавление эффектов наведения
+            ButtonReturnAdd.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ButtonReturnAdd.Image = Image.FromFile("button/ReturnColor.png");
+            };
+
+            ButtonReturnAdd.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ButtonReturnAdd.Image = Image.FromFile("button/Return.png");
+            };
+
+            ButtonReturnAdd.Click += (sender, e) =>
+            {
+                OnOffAddTesting(false);
+                OnOffTestMain(true);
+            };
+
+            // кнопка ВЫХОД
+            ButtonExitAdd.Location = new Point(1173, 795);
+            ButtonExitAdd.Name = "ButtonExitAdd";
+            ButtonExitAdd.Size = new Size(305 + 20, 71 + 20);
+            ButtonExitAdd.BackColor = Color.FromArgb(178, 219, 241); // установка цвета
+            ButtonExitAdd.TabIndex = 0;
+            ButtonExitAdd.Image = Image.FromFile("button/ExitTestMain.png");
+
+            this.Controls.Add(ButtonExitAdd);
+            ButtonExitAdd.BringToFront();
+
+            // Добавление эффектов наведения
+            ButtonExitAdd.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ButtonExitAdd.Image = Image.FromFile("button/ExitTestMainColor.png");
+            };
+
+            ButtonExitAdd.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ButtonExitAdd.Image = Image.FromFile("button/ExitTestMain.png");
+            };
+
+            ButtonExitAdd.Click += (sender, e) => { this.Close(); }; //обработчик события Click     
+
+        }
+
+
+        // ОБЩИЙ РЕЙТИНГ
+        PictureBox ReturnAllRating = new PictureBox();       //возврат в главную теста
+
+        PictureBox fonAllRating = new PictureBox();
+        Label userAllRating = new Label();
+        Label nameUserAllRating = new Label();
+
+        PictureBox lineHoriz = new PictureBox();
+        PictureBox lineVert = new PictureBox();
+
+        private void AllRatingStr()
+        {
+            //user
+            userAllRating.Text = "User";
+            userAllRating.Location = new Point(0, 20);
+            userAllRating.Name = "userAllRating";
+            userAllRating.AutoSize = true;
+            userAllRating.Font = new Font(privateFonts.Families[0], 24, FontStyle.Bold);
+
+            this.Controls.Add(userAllRating);
+
+            nameUserAllRating.Text = "...";
+            nameUserAllRating.Location = new Point(70, 20);
+            nameUserAllRating.Name = "userNameAllRating";
+            nameUserAllRating.AutoSize = true;
+            nameUserAllRating.Font = new Font(privateFonts.Families[0], 24, FontStyle.Bold);
+
+            this.Controls.Add(nameUserAllRating);
+            this.Controls.SetChildIndex(userAllRating, 0);
+            this.Controls.SetChildIndex(nameUserAllRating, 0);
+
+            //фон admin
+            fonAllRating.Image = Image.FromFile("img/win.png");
+            fonAllRating.Location = new Point(0, 30);
+            fonAllRating.Name = "fonAllRating";
+            fonAllRating.Size = new Size(1600, 875);
+            fonAllRating.SizeMode = PictureBoxSizeMode.Zoom;
+            fonAllRating.TabIndex = 0;
+            fonAllRating.TabStop = false;
+            fonAllRating.SendToBack();
+
+            this.Controls.Add(fonAllRating);
+
+            using (Graphics g = Graphics.FromImage(fonAllRating.Image))
+            {
+                using (Font font = new Font(privateFonts.Families[0], 96, FontStyle.Bold))
+                {
+                    g.DrawString("Рейтинг", font, Brushes.Black, new PointF(350, 0));
+                }
+            }
+            fonAllRating.Invalidate(); // Обновляем PictureBox, чтобы изменения отобразились
+
+            // кнопка Return
+            ReturnAllRating.Location = new Point(1126, 798);
+            ReturnAllRating.Name = "ReturnAllRating";
+            ReturnAllRating.Size = new Size(305 + 20, 71 + 20);
+            ReturnAllRating.BackColor = Color.FromArgb(252, 242, 239); // установка цвета
+            ReturnAllRating.TabIndex = 0;
+            ReturnAllRating.Image = Image.FromFile("button/ReturnAllRating.png");
+
+            this.Controls.Add(ReturnAllRating);
+            this.Controls.SetChildIndex(ReturnAllRating, 0);
+
+            ReturnAllRating.BringToFront();
+
+            // Добавление эффектов наведения
+            ReturnAllRating.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ReturnAllRating.Image = Image.FromFile("button/ReturnAllRatingColor.png");
+            };
+
+            ReturnAllRating.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ReturnAllRating.Image = Image.FromFile("button/ReturnAllRating.png");
+            };
+
+            ReturnAllRating.Click += (sender, e) =>
+            {
+                OnOffAllRatingStr(false);
+                OnOffTestMain(true);
+            };
+
+            lineHoriz.Location = new Point(37, 295);
+            lineHoriz.Name = "lineHoriz";
+            lineHoriz.Size = new Size(767, 2);
+            lineHoriz.SizeMode = PictureBoxSizeMode.Zoom;
+            lineHoriz.TabIndex = 0;
+            lineHoriz.TabStop = false;
+            lineHoriz.BackColor = Color.Black;
+            lineHoriz.BringToFront();
+
+            this.Controls.Add(lineHoriz);
+            this.Controls.SetChildIndex(lineHoriz, 0);
+
+            lineVert.Location = new Point(852, 40);
+            lineVert.Name = "lineVert";
+            lineVert.Size = new Size(2, 852);
+            lineVert.SizeMode = PictureBoxSizeMode.Zoom;
+            lineVert.TabIndex = 0;
+            lineVert.TabStop = false;
+            lineVert.BackColor = Color.Black;
+            lineVert.BringToFront();
+
+            this.Controls.Add(lineVert);
+            this.Controls.SetChildIndex(lineVert, 0);
+        }
+
+        // страница ВЫБОР ТЕСТА
+        PictureBox ReturnSelectionTest = new PictureBox();       //возврат в главную теста
+
+        PictureBox fonSelectionTest = new PictureBox();
+        PictureBox fonSelectionTest2 = new PictureBox();
+        Label userSelectionTest = new Label();
+        Label nameUserSelectionTest = new Label();
+
+        PictureBox test1 = new PictureBox();
+        PictureBox test11 = new PictureBox();
+        Label nameTest1 = new Label();
+
+        PictureBox test2 = new PictureBox();
+        PictureBox test21 = new PictureBox();
+        Label nameTest2 = new Label();
+
+        private void OnOffSelectionTest(bool isOn)
+        {
+            ReturnSelectionTest.Enabled = isOn;
+            ReturnSelectionTest.Visible = isOn;
+
+            fonSelectionTest.Enabled = isOn;
+            fonSelectionTest.Visible = isOn;
+            fonSelectionTest2.Enabled = isOn;
+            fonSelectionTest2.Visible = isOn;
+
+            userSelectionTest.Enabled = isOn;
+            userSelectionTest.Visible = isOn;
+            nameUserSelectionTest.Enabled = isOn;
+            nameUserSelectionTest.Visible = isOn;
+
+            test1.Enabled = isOn;
+            test1.Visible = isOn;
+            test11.Enabled = isOn;
+            test11.Visible = isOn;
+            nameTest1.Enabled = isOn;
+            nameTest1.Visible = isOn;
+
+            test2.Enabled = isOn;
+            test2.Visible = isOn;
+            test21.Enabled = isOn;
+            test21.Visible = isOn;
+            nameTest2.Enabled = isOn;
+            nameTest2.Visible = isOn;
+
+            timer1.Enabled = isOn;
+
+        }
+
+        private int originalY; // Исходная координата Y
+        private int targetY;    // Целевая координата Y (вверх)
+        private bool isAnimating = false;
+        System.Windows.Forms.Timer timer1 = new System.Windows.Forms.Timer();
+
+        //анимация
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (isAnimating)
+            {
+                // Плавное движение
+                int step = (test11.Top < targetY) ? 1 : -1;
+                test11.Top += step;
+
+                // Проверка достижения цели
+                if ((step > 0 && test11.Top >= targetY) || (step < 0 && test11.Top <= targetY))
+                {
+                    test11.Top = targetY;
+                    isAnimating = false;
+                    timer1.Stop();
+                }
+            }
+        }
+
+        private void SelectionTest()
+        {
+            //user
+            userSelectionTest.Text = "User";
+            userSelectionTest.Location = new Point(0, 20);
+            userSelectionTest.Name = "userSelectionTest";
+            userSelectionTest.AutoSize = true;
+            userSelectionTest.Font = new Font(privateFonts.Families[0], 24, FontStyle.Bold); ;
+            userSelectionTest.BringToFront();
+
+            this.Controls.Add(userSelectionTest);
+
+            nameUserSelectionTest.Text = "...";
+            nameUserSelectionTest.Location = new Point(70, 20);
+            nameUserSelectionTest.Name = "nameUserSelectionTest";
+            nameUserSelectionTest.AutoSize = true;
+            nameUserSelectionTest.Font = new Font(privateFonts.Families[0], 24, FontStyle.Bold); ;
+            nameUserSelectionTest.BringToFront();
+
+            this.Controls.Add(nameUserSelectionTest);
+            this.Controls.SetChildIndex(userSelectionTest, 0);
+            this.Controls.SetChildIndex(nameUserSelectionTest, 0);
+
+            //фон выбор теста
+            fonSelectionTest.Image = Image.FromFile("img/TestMainAll.png");
+            fonSelectionTest.Location = new Point(0, 30);
+            fonSelectionTest.Name = "fonSelectionTest";
+            fonSelectionTest.Size = new Size(1600, 875);
+            fonSelectionTest.SizeMode = PictureBoxSizeMode.Zoom;
+            fonSelectionTest.TabIndex = 0;
+            fonSelectionTest.TabStop = false;
+            fonSelectionTest.SendToBack();
+
+            this.Controls.Add(fonSelectionTest);
+            this.Controls.SetChildIndex(fonSelectionTest, 10000);
+
+            // Рисование текста поверх PictureBox
+            using (Graphics g = Graphics.FromImage(fonSelectionTest.Image))
+            {
+                using (Font font = new Font(privateFonts.Families[0], 96, FontStyle.Bold))
+                {
+                    g.DrawString("Выбор теста", font, Brushes.Black, new PointF(350, 0));
+                }
+            }
+            fonSelectionTest.Invalidate(); // Обновляем PictureBox, чтобы изменения отобразились
+
+            // кнопка Return
+            ReturnSelectionTest.Location = new Point(1251, 48);
+            ReturnSelectionTest.Name = "ReturnSelectionTest";
+            ReturnSelectionTest.Size = new Size(305 + 20, 71 + 20);
+            ReturnSelectionTest.BackColor = Color.FromArgb(252, 242, 239); // установка цвета
+            ReturnSelectionTest.TabIndex = 0;
+            ReturnSelectionTest.Image = Image.FromFile("button/ReturnAllRating.png");
+
+            this.Controls.Add(ReturnSelectionTest);
+            this.Controls.SetChildIndex(ReturnSelectionTest, 0);
+
+            // Добавление эффектов наведения
+            ReturnSelectionTest.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ReturnSelectionTest.Image = Image.FromFile("button/ReturnAllRatingColor.png");
+            };
+
+            ReturnSelectionTest.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ReturnSelectionTest.Image = Image.FromFile("button/ReturnAllRating.png");
+            };
+
+            ReturnSelectionTest.Click += (sender, e) =>
+            {
+                OnOffSelectionTest(false);
+                OnOffTestMain(true);
+            };
+
+            // test # 1
+            test1.Location = new Point(56, 168);
+            test1.Name = "test1";
+            test1.Size = new Size(150, 150);
+            test1.BackColor = Color.FromArgb(252, 242, 239); // установка цвета
+            test1.TabIndex = 0;
+            test1.Image = Image.FromFile("object/test.png");
+            test1.SendToBack();
+
+            this.Controls.Add(test1);
+
+            test11.Location = new Point(56, 168);
+            test11.Name = "test11";
+            test11.Size = new Size(100, 100);
+            test11.BackColor = Color.FromArgb(252, 242, 239); // установка цвета
+            test11.TabIndex = 0;
+            test11.Image = Image.FromFile("object/MathPrimers1.png");
+            test11.BringToFront();
+
+            this.Controls.Add(test11);
+
+            nameTest1.Text = "Math Primers Level 1";
+            nameTest1.Location = new Point(56, 265);
+            nameTest1.Name = "nameTest";
+            nameTest1.Size = new Size(150, 50);         // Сделать перенос на следующую строку
+            nameTest1.AutoSize = true;
+            nameTest1.Font = new Font(privateFonts.Families[1], 14, FontStyle.Italic);
+            nameTest1.BackColor = Color.FromArgb(254, 242, 239); // установка цвета
+            nameTest1.BringToFront();
+
+            this.Controls.Add(nameTest1);
+
+            this.Controls.SetChildIndex(test11, 0);
+            this.Controls.SetChildIndex(nameTest1, 0);
+            this.Controls.SetChildIndex(test1, 1000);
+
+            // анимация
+            originalY = test11.Top;
+            targetY = originalY - 20; // Движение вверх на 20 пикселей
+            timer1.Interval = 10;
+            timer1.Tick += timer1_Tick;
+
+            test11.MouseEnter += (s, ev) =>
+            {
+                test11.Image = Image.FromFile("object/MathPrimers1.png");
+                isAnimating = true;
+                targetY = originalY - 20;
+                timer1.Start();
+            };
+
+            test11.MouseLeave += (s, ev) =>
+            {
+                isAnimating = true;
+                targetY = originalY;
+                timer1.Start();
+            };
+
+
 
         }
 
