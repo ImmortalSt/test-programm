@@ -1543,9 +1543,13 @@ namespace test_programm
         }
 
         private int originalY; // Исходная координата Y
+        private int originalX; // Исходная координата X
         private int targetY;    // Целевая координата Y (вверх)
+        private int targetX;    // Целевая координата X (влево)
         private bool isAnimating = false;
+        private bool isAnimatingHoriz = false;
         System.Windows.Forms.Timer timer1 = new System.Windows.Forms.Timer();
+        System.Windows.Forms.Timer timer2 = new System.Windows.Forms.Timer();
 
         //анимация
         private void timer1_Tick(object sender, EventArgs e)
@@ -1562,6 +1566,24 @@ namespace test_programm
                     test11.Top = targetY;
                     isAnimating = false;
                     timer1.Stop();
+                }
+            }
+        }
+
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            if (isAnimatingHoriz)
+            {
+                // Плавное движение
+                int step = (test11.Top < targetX) ? 1 : -1;
+                test11.Left += step;
+
+                // Проверка достижения цели
+                if ((step > 0 && test11.Left >= targetX) || (step < 0 && test11.Left <= targetX))
+                {
+                    test11.Left = targetX;
+                    isAnimatingHoriz = false;
+                    timer2.Stop();
                 }
             }
         }
@@ -1680,9 +1702,12 @@ namespace test_programm
 
             // анимация
             originalY = test11.Top;
-            targetY = originalY - 20; // Движение вверх на 20 пикселей
             timer1.Interval = 10;
             timer1.Tick += timer1_Tick;
+
+            originalX = test11.Left;
+            timer2.Interval = 10;
+            timer2.Tick += timer2_Tick;
 
             test11.MouseEnter += (s, ev) =>
             {
@@ -1701,7 +1726,14 @@ namespace test_programm
 
             test11.Click += (sender, e) =>
             {
+                if (!isAnimatingHoriz)
+                {
+                    isAnimatingHoriz = true;
+                    targetX = originalX - 20;
+                    timer2.Start();
+                }
                 OnOffSelectionTest(false);
+                //Сделать плавное открыте страницы
                 OnOffPassingTheTest(true);
             };
 
@@ -1712,8 +1744,8 @@ namespace test_programm
 
 
         // страница ПРОХОЖДЕНИЕ ТЕСТА
-        PictureBox ReturnPassingTheTest = new PictureBox();       //возврат в главную теста
-        PictureBox ButtonAnswer = new PictureBox();               //кнопка ответ на вопрос
+        PictureBox ReturnPassingTheTest = new PictureBox();     //возврат в главную теста
+        PictureBox ButtonAnswer = new PictureBox();             //кнопка ответ на вопрос
         PictureBox answer1 = new PictureBox();
         PictureBox answer2 = new PictureBox();
         PictureBox answer3 = new PictureBox();
