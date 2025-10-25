@@ -52,15 +52,17 @@ namespace test_programm
             RegisterStr();
             TestMain();
             MainAdmin();
+            AddTesting();
             AllRatingStr();
             SelectionTest();
-            AddTesting();
+            PassingTheTest();
             OnOffRegisterStr(false);
             OnOffTestMain(false);
             OnOffMainAdmin(false);
             OnOffAllRatingStr(false);
             OnOffSelectionTest(false);
             OnOffAddTesting(false);
+            OnOffPassingTheTest(false);
 
             this.Size = new Size(isForm, 900);
 
@@ -217,7 +219,7 @@ namespace test_programm
             lineVert.Visible = isOn;
         }
 
-
+        //СТАРТОВАЯ СТРАНИЦА
         PictureBox Enter = new PictureBox();        //вход
         PictureBox Exit = new PictureBox();         //выход
         PictureBox Registr = new PictureBox();      //регистрация
@@ -234,7 +236,7 @@ namespace test_programm
         [DllImport("user32.dll")]
         static extern bool HideCaret(IntPtr hWnd);
 
-        //СТАРТОВАЯ СТРАНИЦА
+
         private void MainStr()
         {
             // название программы
@@ -305,7 +307,6 @@ namespace test_programm
                     nameStart.ForeColor = Color.Gray;
                 }
             };
-
 
             // пароль
             pass.Image = Image.FromFile("object/entry_cell.png");
@@ -1507,6 +1508,7 @@ namespace test_programm
         PictureBox test21 = new PictureBox();
         Label nameTest2 = new Label();
 
+        // включение страницы
         private void OnOffSelectionTest(bool isOn)
         {
             ReturnSelectionTest.Enabled = isOn;
@@ -1697,11 +1699,362 @@ namespace test_programm
                 timer1.Start();
             };
 
+            test11.Click += (sender, e) =>
+            {
+                OnOffSelectionTest(false);
+                OnOffPassingTheTest(true);
+            };
+
+
 
 
         }
 
 
+        // страница ПРОХОЖДЕНИЕ ТЕСТА
+        PictureBox ReturnPassingTheTest = new PictureBox();       //возврат в главную теста
+        PictureBox ButtonAnswer = new PictureBox();               //кнопка ответ на вопрос
+        PictureBox answer1 = new PictureBox();
+        PictureBox answer2 = new PictureBox();
+        PictureBox answer3 = new PictureBox();
+
+        PictureBox fonPassingTheTest = new PictureBox();        //фон страницы
+        Label userPassingTheTest = new Label();                 //пользовтель
+        Label nameUserPassingTheTest = new Label();             //имя логина
+
+        Label testThema = new Label();                          //тема
+        Label testThemaName = new Label();                      //название темы
+
+        Label testNumQuestion = new Label();                    //следующий вопрос
+        Label testNumQuest = new Label();                       //слеш
+        Label testNumQuestionAll = new Label();                 //всего вопросов
+
+        Label testQuestion = new Label();                       //вопрос
+        Label testQuestionName = new Label();                   //текст вопроса
+
+        bool isFirstImage = true;                               //переключение между картинками чекбокса
+        Label testAnswer1 = new Label();                        //вариант ответа 1
+        Label testAnswer2 = new Label();                        //вариант ответа 2
+        Label testAnswer3 = new Label();                        //вариант ответа 3
+
+        // включение страницы ДОБАВИТЬ ТЕСТ
+        private void OnOffPassingTheTest(bool isOn)
+        {
+            ReturnPassingTheTest.Enabled = isOn; ReturnPassingTheTest.Visible = isOn;
+            ButtonAnswer.Enabled = isOn; ButtonAnswer.Visible = isOn;
+            answer1.Enabled = isOn; answer1.Visible = isOn;
+            answer2.Enabled = isOn; answer2.Visible = isOn;
+            answer3.Enabled = isOn; answer3.Visible = isOn;
+
+            testThema.Enabled = isOn; testThema.Visible = isOn;
+            testThemaName.Enabled = isOn; testThemaName.Visible = isOn;
+            testNumQuestion.Enabled = isOn; testNumQuestion.Visible = isOn;
+            testNumQuest.Enabled = isOn; testNumQuest.Visible = isOn;
+            testNumQuestionAll.Enabled = isOn; testNumQuestionAll.Visible = isOn;
+            testQuestion.Enabled = isOn; testQuestion.Visible = isOn;
+            testQuestionName.Enabled = isOn; testQuestionName.Visible = isOn;
+
+            testAnswer1.Enabled = isOn; testAnswer1.Visible = isOn;
+            testAnswer2.Enabled = isOn; testAnswer2.Visible = isOn;
+            testAnswer3.Enabled = isOn; testAnswer3.Visible = isOn;
+
+            fonPassingTheTest.Enabled = isOn; fonPassingTheTest.Visible = isOn;
+            userPassingTheTest.Enabled = isOn; userPassingTheTest.Visible = isOn;
+            nameUserPassingTheTest.Enabled = isOn; nameUserPassingTheTest.Visible = isOn;
+        }
+
+
+        private void PassingTheTest()
+        {
+            //user
+            userPassingTheTest.Text = "User";
+            userPassingTheTest.Location = new Point(10, 20);
+            userPassingTheTest.Name = "userPassingTheTest";
+            userPassingTheTest.AutoSize = true;
+            userPassingTheTest.Font = new Font(privateFonts.Families[0], 24, FontStyle.Bold);
+            userPassingTheTest.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            userPassingTheTest.BringToFront();
+
+            this.Controls.Add(userPassingTheTest);
+
+            nameUserPassingTheTest.Text = "...";
+            nameUserPassingTheTest.Location = new Point(70, 20);
+            nameUserPassingTheTest.Name = "nameUserSelectionTest";
+            nameUserPassingTheTest.AutoSize = true;
+            nameUserPassingTheTest.Font = new Font(privateFonts.Families[0], 24, FontStyle.Bold);
+            nameUserPassingTheTest.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            nameUserPassingTheTest.BringToFront();
+
+            this.Controls.Add(nameUserPassingTheTest);
+            this.Controls.SetChildIndex(userPassingTheTest, 0);
+            this.Controls.SetChildIndex(nameUserPassingTheTest, 0);
+
+            //фон выбор теста
+            fonPassingTheTest.Image = Image.FromFile("img/fonPassingTheTest.png");
+            fonPassingTheTest.Location = new Point(0, 20);
+            fonPassingTheTest.Name = "fonPassingTheTest";
+            fonPassingTheTest.Size = new Size(1600, 875);
+            fonPassingTheTest.SizeMode = PictureBoxSizeMode.Zoom;
+            fonPassingTheTest.TabIndex = 0;
+            fonPassingTheTest.TabStop = false;
+            fonPassingTheTest.SendToBack();
+
+            this.Controls.Add(fonPassingTheTest);
+            this.Controls.SetChildIndex(fonPassingTheTest, 10000);
+
+            // Рисование текста поверх PictureBox
+            using (Graphics g = Graphics.FromImage(fonPassingTheTest.Image))
+            {
+                using (Font font = new Font(privateFonts.Families[0], 96, FontStyle.Bold))
+                {
+                    g.DrawString("Tест", font, Brushes.Black, new PointF(500, 0));
+                }
+            }
+            fonPassingTheTest.Invalidate(); // Обновляем PictureBox, чтобы изменения отобразились
+
+            // кнопка Return
+            ReturnPassingTheTest.Location = new Point(1250, 600);
+            ReturnPassingTheTest.Name = "ReturnPassingTheTest";
+            ReturnPassingTheTest.Size = new Size(304 + 20, 70 + 20);
+            ReturnPassingTheTest.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            ReturnPassingTheTest.TabIndex = 0;
+            ReturnPassingTheTest.Image = Image.FromFile("button/ReturnPassingTheTest.png");
+
+            this.Controls.Add(ReturnPassingTheTest);
+            this.Controls.SetChildIndex(ReturnPassingTheTest, 0);
+
+            // Добавление эффектов наведения
+            ReturnPassingTheTest.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ReturnPassingTheTest.Image = Image.FromFile("button/ReturnPassingTheTestColor.png");
+            };
+
+            ReturnPassingTheTest.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ReturnPassingTheTest.Image = Image.FromFile("button/ReturnPassingTheTest.png");
+            };
+
+            ReturnPassingTheTest.Click += (sender, e) =>
+            {
+                OnOffPassingTheTest(false);
+                OnOffSelectionTest(true);
+            };
+
+            // кнопка ButtonAnswer
+            ButtonAnswer.Location = new Point(76, 800);
+            ButtonAnswer.Name = "ButtonAnswer";
+            ButtonAnswer.Size = new Size(300 + 20, 52 + 20);
+            ButtonAnswer.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            ButtonAnswer.TabIndex = 0;
+            ButtonAnswer.Image = Image.FromFile("button/ButtonAnswer.png");
+
+            this.Controls.Add(ButtonAnswer);
+            this.Controls.SetChildIndex(ButtonAnswer, 0);
+
+            // Добавление эффектов наведения
+            ButtonAnswer.MouseEnter += (sender, e) =>
+            {
+                // изменить изображение на другое (например, с подсветкой)
+                ButtonAnswer.Image = Image.FromFile("button/ButtonAnswerColor.png");
+            };
+
+            ButtonAnswer.MouseLeave += (sender, e) =>
+            {
+                //возвращаем исходное изображение
+                ButtonAnswer.Image = Image.FromFile("button/ButtonAnswer.png");
+            };
+
+            ButtonAnswer.Click += (sender, e) =>
+            {
+
+            };
+
+            // Тема теста
+            testThema.Text = "Тема:";
+            testThema.Location = new Point(44, 140);
+            testThema.Name = "testThema";
+            testThema.AutoSize = true;
+            testThema.Font = new Font(privateFonts.Families[1], 22, FontStyle.Bold);
+            testThema.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            testThema.BringToFront();
+
+            this.Controls.Add(testThema);
+
+            testThemaName.Text = "...";
+            testThemaName.Location = new Point(100, 140);
+            testThemaName.Name = "testThemaName";
+            testThemaName.AutoSize = true;
+            testThemaName.Font = new Font(privateFonts.Families[1], 22, FontStyle.Bold);
+            testThemaName.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            testThemaName.BringToFront();
+
+            this.Controls.Add(testThemaName);
+
+            //номер вопроса
+            testNumQuestion.Text = "...";
+            testNumQuestion.Location = new Point(44, 185);
+            testNumQuestion.Name = "testNumQuestion";
+            testNumQuestion.AutoSize = true;
+            testNumQuestion.Font = new Font(privateFonts.Families[1], 22, FontStyle.Bold);
+            testNumQuestion.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            testNumQuestion.BringToFront();
+
+            this.Controls.Add(testNumQuestion);
+
+            testNumQuest.Text = "/";
+            testNumQuest.Location = new Point(84, 185);
+            testNumQuest.Name = "testNumQuest";
+            testNumQuest.AutoSize = true;
+            testNumQuest.Font = new Font(privateFonts.Families[1], 22, FontStyle.Bold);
+            testNumQuest.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            testNumQuest.BringToFront();
+
+            this.Controls.Add(testNumQuest);
+
+            testNumQuestionAll.Text = "...";
+            testNumQuestionAll.Location = new Point(114, 185);
+            testNumQuestionAll.Name = "testNumQuestionAll";
+            testNumQuestionAll.AutoSize = true;
+            testNumQuestionAll.Font = new Font(privateFonts.Families[1], 22, FontStyle.Bold);
+            testNumQuestionAll.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            testNumQuestionAll.BringToFront();
+
+            this.Controls.Add(testNumQuestionAll);
+
+            // вопрос
+            testQuestion.Text = "Вопрос:";
+            testQuestion.Location = new Point(44, 230);
+            testQuestion.Name = "testQuestion";
+            testQuestion.AutoSize = true;
+            testQuestion.Font = new Font(privateFonts.Families[1], 32, FontStyle.Bold);
+            testQuestion.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            testQuestion.BringToFront();
+
+            this.Controls.Add(testQuestion);
+
+            testQuestionName.Text = "...";
+            testQuestionName.Location = new Point(44, 290);
+            testQuestionName.Name = "testQuestionName";
+            testQuestionName.AutoSize = true;
+            testQuestionName.Font = new Font(privateFonts.Families[1], 32, FontStyle.Bold);
+            testQuestionName.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            testQuestionName.BringToFront();
+
+            this.Controls.Add(testQuestionName);
+
+            this.Controls.SetChildIndex(testThema, 0);
+            this.Controls.SetChildIndex(testThemaName, 0);
+            this.Controls.SetChildIndex(testNumQuestion, 0);
+            this.Controls.SetChildIndex(testNumQuest, 0);
+            this.Controls.SetChildIndex(testNumQuestionAll, 0);
+            this.Controls.SetChildIndex(testQuestion, 0);
+            this.Controls.SetChildIndex(testQuestionName, 0);
+
+            // checkBox 1
+            answer1.Location = new Point(75, 710);
+            answer1.Name = "answer1";
+            answer1.Size = new Size(40, 40);
+            answer1.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            answer1.TabIndex = 0;
+            answer1.Image = Image.FromFile("button/CheckBoxAnswer.png");
+
+            this.Controls.Add(answer1);
+            this.Controls.SetChildIndex(answer1, 0);
+
+            answer1.Click += (sender, e) =>
+            {
+                if (isFirstImage)
+                {
+                    answer1.Image = Image.FromFile("button/CheckBoxAnswerColor.png");
+                }
+                else
+                {
+                    answer1.Image = Image.FromFile("button/CheckBoxAnswer.png");
+                }
+                isFirstImage = !isFirstImage;
+            };
+
+            testAnswer1.Text = "Ответ 1";
+            testAnswer1.Location = new Point(100, 700);
+            testAnswer1.Name = "testAnswer1";
+            testAnswer1.AutoSize = true;
+            testAnswer1.Font = new Font(privateFonts.Families[1], 32, FontStyle.Bold);
+            testAnswer1.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            testAnswer1.BringToFront();
+
+            this.Controls.Add(testAnswer1);
+
+            // checkBox 2
+            answer2.Location = new Point(400, 710);
+            answer2.Name = "answer2";
+            answer2.Size = new Size(40, 40);
+            answer2.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            answer2.TabIndex = 0;
+            answer2.Image = Image.FromFile("button/CheckBoxAnswer.png");
+
+            this.Controls.Add(answer2);
+            this.Controls.SetChildIndex(answer2, 0);
+
+            answer2.Click += (sender, e) =>
+            {
+                if (isFirstImage)
+                {
+                    answer2.Image = Image.FromFile("button/CheckBoxAnswerColor.png");
+                }
+                else
+                {
+                    answer2.Image = Image.FromFile("button/CheckBoxAnswer.png");
+                }
+                isFirstImage = !isFirstImage;
+            };
+
+            testAnswer2.Text = "Ответ 2";
+            testAnswer2.Location = new Point(430, 700);
+            testAnswer2.Name = "testAnswer2";
+            testAnswer2.AutoSize = true;
+            testAnswer2.Font = new Font(privateFonts.Families[1], 32, FontStyle.Bold);
+            testAnswer2.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            testAnswer2.BringToFront();
+
+            this.Controls.Add(testAnswer2);
+
+            // checkBox 3
+            answer3.Location = new Point(775, 710);
+            answer3.Name = "answer3";
+            answer3.Size = new Size(40, 40);
+            answer3.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            answer3.TabIndex = 0;
+            answer3.Image = Image.FromFile("button/CheckBoxAnswer.png");
+
+            this.Controls.Add(answer3);
+            this.Controls.SetChildIndex(answer3, 0);
+
+            answer3.Click += (sender, e) =>
+            {
+                if (isFirstImage)
+                {
+                    answer3.Image = Image.FromFile("button/CheckBoxAnswerColor.png");
+                }
+                else
+                {
+                    answer3.Image = Image.FromFile("button/CheckBoxAnswer.png");
+                }
+                isFirstImage = !isFirstImage;
+            };
+
+            testAnswer3.Text = "Ответ 3";
+            testAnswer3.Location = new Point(800, 700);
+            testAnswer3.Name = "testAnswer3";
+            testAnswer3.AutoSize = true;
+            testAnswer3.Font = new Font(privateFonts.Families[1], 32, FontStyle.Bold);
+            testAnswer3.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            testAnswer3.BringToFront();
+
+            this.Controls.Add(testAnswer3);
+
+        }
 
     }
 }
