@@ -1546,43 +1546,47 @@ namespace test_programm
         private int originalX; // Исходная координата X
         private int targetY;    // Целевая координата Y (вверх)
         private int targetX;    // Целевая координата X (влево)
-        private bool isAnimating = false;
-        private bool isAnimatingHoriz = false;
+        private bool isAnimatingVertically = false;
+        private bool isAnimatingHorizontally = false;
         System.Windows.Forms.Timer timer1 = new System.Windows.Forms.Timer();
         System.Windows.Forms.Timer timer2 = new System.Windows.Forms.Timer();
 
         //анимация
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if (isAnimating)
+            if (isAnimatingVertically)
             {
-                // Плавное движение
-                int step = (test11.Top < targetY) ? 1 : -1;
+                int step = (test11.Top < targetY) ? -1 : 1; // Движение вверх
                 test11.Top += step;
 
-                // Проверка достижения цели
-                if ((step > 0 && test11.Top >= targetY) || (step < 0 && test11.Top <= targetY))
+                if ((step < 0 && test11.Top <= targetY) || (step > 0 && test11.Top >= targetY))
                 {
                     test11.Top = targetY;
-                    isAnimating = false;
+                    isAnimatingVertically = false;
                     timer1.Stop();
+
+                    // После завершения вертикальной анимации запускаем горизонтальную
+                    if (test11.Top == originalY - 20) // Если движение вверх завершено
+                    {
+                        isAnimatingHorizontally = true;
+                        targetX = originalX - 20;
+                        timer2.Start();
+                    }
                 }
             }
         }
 
         private void timer2_Tick(object sender, EventArgs e)
         {
-            if (isAnimatingHoriz)
+            if (isAnimatingHorizontally)
             {
-                // Плавное движение
-                int step = (test11.Top < targetX) ? 1 : -1;
+                int step = (test11.Left < targetX) ? -1 : 1; // Движение влево или вправо
                 test11.Left += step;
 
-                // Проверка достижения цели
-                if ((step > 0 && test11.Left >= targetX) || (step < 0 && test11.Left <= targetX))
+                if ((step < 0 && test11.Left <= targetX) || (step > 0 && test11.Left >= targetX))
                 {
                     test11.Left = targetX;
-                    isAnimatingHoriz = false;
+                    isAnimatingHorizontally = false;
                     timer2.Stop();
                 }
             }
@@ -1702,38 +1706,47 @@ namespace test_programm
 
             // анимация
             originalY = test11.Top;
-            timer1.Interval = 10;
+            timer1.Interval = 70;
             timer1.Tick += timer1_Tick;
 
             originalX = test11.Left;
-            timer2.Interval = 10;
+            timer2.Interval = 70;
             timer2.Tick += timer2_Tick;
 
+            // Обработчики событий
             test11.MouseEnter += (s, ev) =>
             {
                 test11.Image = Image.FromFile("object/MathPrimers1.png");
-                isAnimating = true;
+
+                // Сначала поднимаем картинку вверх
+                isAnimatingVertically = true;
                 targetY = originalY - 20;
                 timer1.Start();
             };
 
             test11.MouseLeave += (s, ev) =>
             {
-                isAnimating = true;
-                targetY = originalY;
-                timer1.Start();
+                // Сначала сдвигаем картинку вправо
+                isAnimatingHorizontally = true;
+                targetX = originalX;
+                timer2.Start();
+
+                // После завершения горизонтальной анимации опускаем картинку вниз
+                timer2.Tick += (sender, e) =>
+                {
+                    if (!isAnimatingHorizontally && test11.Left == originalX)
+                    {
+                        isAnimatingVertically = true;
+                        targetY = originalY;
+                        timer1.Start();
+                        timer2.Tick -= (sender, e) => { }; // Удаляем временный обработчик
+                    }
+                };
             };
 
             test11.Click += (sender, e) =>
             {
-                if (!isAnimatingHoriz)
-                {
-                    isAnimatingHoriz = true;
-                    targetX = originalX - 20;
-                    timer2.Start();
-                }
                 OnOffSelectionTest(false);
-                //Сделать плавное открыте страницы
                 OnOffPassingTheTest(true);
             };
 
