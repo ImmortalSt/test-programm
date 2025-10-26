@@ -57,6 +57,7 @@ namespace test_programm
             AllRatingStr();
             SelectionTest();
             PassingTheTest();
+
             OnOffRegisterStr(false);
             OnOffTestMain(false);
             OnOffMainAdmin(false);
@@ -64,6 +65,8 @@ namespace test_programm
             OnOffSelectionTest(false);
             OnOffAddTesting(false);
             OnOffPassingTheTest(false);
+
+
 
 
             this.Size = new Size(isForm, 900);
@@ -134,8 +137,11 @@ namespace test_programm
             nameTest.Visible = isOn;
             nameStart.Enabled = isOn;
             nameStart.Visible = isOn;
-            loginStart.Enabled = isOn;
-            loginStart.Visible = isOn;
+            passStart.Enabled = isOn;
+            passStart.Visible = isOn;
+
+            empty.Enabled = isOn;
+            empty.Visible = isOn;
         }
 
         private void OnOffRegisterStr(bool isOn)
@@ -232,8 +238,9 @@ namespace test_programm
         PictureBox pass = new PictureBox();
         PictureBox eye = new PictureBox();
         Label nameTest = new Label();
+        TextBox empty = new TextBox();
         TextBox nameStart = new TextBox();
-        Label loginStart = new Label();
+        TextBox passStart = new TextBox();
 
         [DllImport("user32.dll")]
         static extern bool HideCaret(IntPtr hWnd);
@@ -262,6 +269,43 @@ namespace test_programm
             fon.SendToBack();
 
             this.Controls.Add(fon);
+
+            // пустой текст
+            empty.Text = "";
+            empty.PlaceholderText = "";
+            empty.Location = new Point(110, 220);
+            empty.Name = "empty";
+            empty.Size = new Size(415, 40);
+            empty.Font = new Font(privateFonts.Families[1], 20, FontStyle.Bold);
+            empty.BackColor = Color.FromArgb(104, 201, 190); // установка цвета
+            empty.BorderStyle = BorderStyle.None;   // Убираем рамку
+            empty.ForeColor = Color.Gray;           // Цвет подсказки
+            empty.BringToFront();
+
+            this.Controls.Add(empty);
+            this.Controls.SetChildIndex(empty, 100);
+
+            // Очищаем текст при фокусировке
+            nameStart.GotFocus += (sender, e) =>
+            {
+                if (empty.Text == "")
+                {
+                    empty.Text = "";
+                    empty.ForeColor = Color.Black;
+                    HideCaret(empty.Handle); // Скрыть курсор
+                }
+            };
+
+            // Возвращаем подсказку, если поле пустое
+            empty.LostFocus += (sender, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(empty.Text))
+                {
+                    empty.Text = "Логин";
+                    empty.ForeColor = Color.Gray;
+                }
+            };
+
 
             // логин
             login.Image = Image.FromFile("object/entry_cell.png");
@@ -321,6 +365,42 @@ namespace test_programm
 
             this.Controls.Add(pass);
 
+            // ввод пароля
+            passStart.Text = "Пароль";
+            passStart.PlaceholderText = "Пароль";
+            passStart.Location = new Point(110, 330);
+            passStart.Name = "passStart";
+            passStart.Size = new Size(415, 40);
+            passStart.Font = new Font(privateFonts.Families[1], 20, FontStyle.Bold);
+            passStart.BackColor = Color.FromArgb(104, 201, 190); // установка цвета
+            passStart.BorderStyle = BorderStyle.None;   // Убираем рамку
+            passStart.ForeColor = Color.Gray;           // Цвет подсказки
+            passStart.BringToFront();
+
+            this.Controls.Add(passStart);
+            this.Controls.SetChildIndex(passStart, 0);
+
+            // Очищаем текст при фокусировке
+            passStart.GotFocus += (sender, e) =>
+            {
+                if (passStart.Text == "Пароль")
+                {
+                    passStart.Text = "";
+                    passStart.ForeColor = Color.Black;
+                    HideCaret(passStart.Handle); // Скрыть курсор
+                }
+            };
+
+            // Возвращаем подсказку, если поле пустое
+            passStart.LostFocus += (sender, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(passStart.Text))
+                {
+                    passStart.Text = "Пароль";
+                    passStart.ForeColor = Color.Gray;
+                }
+            };
+
             // показать пароль            
             eye.Image = Image.FromFile("button/eye.png");
             eye.Location = new Point(561, 303 + 20);
@@ -359,6 +439,7 @@ namespace test_programm
                 OnOffMainStr(false);
                 OnOffTestMain(true);
                 nameStart.Clear();
+                passStart.Clear();
             };
 
             // кнопка РЕГИСТРАЦИЯ
@@ -439,6 +520,8 @@ namespace test_programm
 
         }
 
+
+        // РЕГИСТРАЦИЯ
         PictureBox AddReg = new PictureBox();        //Создать
         PictureBox ReturnReg = new PictureBox();     //Назад в окне РЕГИСТРАЦИЯ
 
@@ -1496,15 +1579,22 @@ namespace test_programm
 
         // страница ВЫБОР ТЕСТА
         PictureBox ReturnSelectionTest = new PictureBox();       //возврат в главную теста
+        //PictureBox ButtonStr0 = new PictureBox();
+        //PictureBox ButtonStr1 = new PictureBox();
+        //PictureBox ButtonStr2 = new PictureBox();
+        //PictureBox ButtonStr3 = new PictureBox();
+        //PictureBox ButtonStr4 = new PictureBox();
 
         PictureBox fonSelectionTest = new PictureBox();
         PictureBox fonSelectionTest2 = new PictureBox();
         Label userSelectionTest = new Label();
         Label nameUserSelectionTest = new Label();
+        Label nameStr = new Label();
 
         PictureBox test1 = new PictureBox();
         PictureBox test11 = new PictureBox();
-        Label nameTest1 = new Label();
+        //Label nameTest1 = new Label();
+        RichTextBox nameTest1 = new RichTextBox();
 
         PictureBox test2 = new PictureBox();
         PictureBox test21 = new PictureBox();
@@ -1515,6 +1605,8 @@ namespace test_programm
         {
             ReturnSelectionTest.Enabled = isOn;
             ReturnSelectionTest.Visible = isOn;
+            //ButtonStr.Enabled = isOn;
+            //ButtonStr.Visible = isOn;
 
             fonSelectionTest.Enabled = isOn;
             fonSelectionTest.Visible = isOn;
@@ -1540,7 +1632,28 @@ namespace test_programm
             nameTest2.Enabled = isOn;
             nameTest2.Visible = isOn;
 
+            nameStr.Enabled = isOn;
+            nameStr.Visible = isOn;
+
             timer1.Enabled = isOn;
+            timer2.Enabled = isOn;
+
+            foreach (Control control in this.Controls)
+            {
+                if (control is PictureBox box)
+                {
+                    if (box.Tag == "Active")
+                    {
+                        box.Enabled = isOn;
+                        box.Visible = isOn;
+                    }
+                    if (box.Tag == "notActive")
+                    {
+                        box.Enabled = isOn;
+                        box.Visible = isOn;
+                    }
+                }
+            }
 
         }
 
@@ -1683,7 +1796,7 @@ namespace test_programm
 
             test11.Location = new Point(56, 168);
             test11.Name = "test11";
-            test11.Size = new Size(100, 100);
+            test11.Size = new Size(110, 110);
             test11.BackColor = Color.FromArgb(252, 242, 239); // установка цвета
             test11.TabIndex = 0;
             test11.Image = Image.FromFile("object/MathPrimers1.png");
@@ -1691,15 +1804,19 @@ namespace test_programm
 
             this.Controls.Add(test11);
 
-            //nameTest1.Text = "Math Primers Level 1";
-            nameTest1.Text = "Math Primers" + Environment.NewLine + Environment.NewLine + "Level 1";
-            nameTest1.Location = new Point(70, 255);
+            nameTest1.Text = "Math Primers Level 1";
+            nameTest1.Location = new Point(60, 265);
             nameTest1.Name = "nameTest";
-            nameTest1.MaximumSize = new Size(125, 125);         // Сделать перенос на следующую строку
-            nameTest1.AutoSize = true;
-            nameTest1.Font = new Font(privateFonts.Families[1], 14, FontStyle.Italic);
+            nameTest1.MaximumSize = new Size(150, 60);         // Сделать перенос на следующую строку
+            nameTest1.BorderStyle = BorderStyle.None; // Убираем рамку, чтобы выглядело как Label
+            nameTest1.ReadOnly = true;
+            nameTest1.Font = new Font(privateFonts.Families[1], 12, FontStyle.Italic);
             nameTest1.BackColor = Color.FromArgb(234, 190, 243); // установка цвета
-
+            nameTest1.Rtf = @"{\rtf1\ansi\deff0 {\fonttbl {\f0 " + privateFonts.Families[1].Name + @";}}"
+                            + @"\fs22\i" // 12t и курсив
+                            + @"\sl00" // 300 твипов = ~0.21 дюйма (межстрочный интервал)
+                            + @"Math Primers\line Level 1}";
+            HideCaret(nameTest1.Handle);
             nameTest1.BringToFront();
 
             this.Controls.Add(nameTest1);
@@ -1710,11 +1827,11 @@ namespace test_programm
 
             // анимация
             originalY = test11.Top;
-            timer1.Interval = 70;
+            timer1.Interval = 200;
             timer1.Tick += timer1_Tick;
 
             originalX = test11.Left;
-            timer2.Interval = 70;
+            timer2.Interval = 200;
             timer2.Tick += timer2_Tick;
 
             // Обработчики событий
@@ -1754,8 +1871,52 @@ namespace test_programm
                 OnOffPassingTheTest(true);
             };
 
+            // кнопка переключение страниц
 
 
+            for (int i = 0; i < 5; i++)
+            {
+                PictureBox buttonStr = new PictureBox();
+                buttonStr.Location = new Point(80 + i * 48 + 25 * i, 830);
+                buttonStr.Name = "buttonStr" + i;
+                buttonStr.Size = new Size(48, 48);
+                buttonStr.BackColor = Color.FromArgb(252, 242, 239); // установка цвета
+                buttonStr.TabIndex = 0;
+                buttonStr.Image = Image.FromFile("button/buttonStr.png");
+                buttonStr.Tag = "notActive";
+
+                if (i == 0)
+                {
+                    buttonStr.Location = new Point(80 + i * 48, 830);
+                    buttonStr.Image = Image.FromFile("button/buttonStrColor.png");
+                    buttonStr.Tag = "Active";
+                }
+
+                this.Controls.Add(buttonStr);
+                this.Controls.SetChildIndex(buttonStr, 10);
+
+                buttonStr.Click += ClickStr;
+            }
+
+
+        }
+
+        private void ClickStr(object sender, EventArgs e)
+        {
+            PictureBox picture = sender as PictureBox;
+            foreach (Control control in this.Controls)
+            {
+                if (control is PictureBox box)
+                {
+                    if (box.Tag == "Active")
+                    {
+                        box.Image = Image.FromFile("button/buttonStr.png");
+                        box.Tag = "notActive";
+                    }
+                }
+            }
+            picture.Image = Image.FromFile("button/buttonStrColor.png");
+            picture.Tag = "Active";
 
         }
 
@@ -1786,7 +1947,7 @@ namespace test_programm
         Label testAnswer2 = new Label();                        //вариант ответа 2
         Label testAnswer3 = new Label();                        //вариант ответа 3
 
-        // включение страницы ДОБАВИТЬ ТЕСТ
+        // включение страницы ПРОХОЖДЕНЕ ТЕСТА
         private void OnOffPassingTheTest(bool isOn)
         {
             ReturnPassingTheTest.Enabled = isOn; ReturnPassingTheTest.Visible = isOn;
