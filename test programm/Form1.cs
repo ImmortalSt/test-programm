@@ -49,6 +49,7 @@ namespace test_programm
             LoadCustomFont();
 
             MainStr();
+
             RegisterStr();
             TestMain();
             MainAdmin();
@@ -63,6 +64,7 @@ namespace test_programm
             OnOffSelectionTest(false);
             OnOffAddTesting(false);
             OnOffPassingTheTest(false);
+
 
             this.Size = new Size(isForm, 900);
 
@@ -1689,20 +1691,22 @@ namespace test_programm
 
             this.Controls.Add(test11);
 
-            nameTest1.Text = "Math Primers Level 1";
-            nameTest1.Location = new Point(56, 265);
+            //nameTest1.Text = "Math Primers Level 1";
+            nameTest1.Text = "Math Primers" + Environment.NewLine + Environment.NewLine + "Level 1";
+            nameTest1.Location = new Point(70, 255);
             nameTest1.Name = "nameTest";
-            nameTest1.Size = new Size(150, 50);         // Сделать перенос на следующую строку
+            nameTest1.MaximumSize = new Size(125, 125);         // Сделать перенос на следующую строку
             nameTest1.AutoSize = true;
             nameTest1.Font = new Font(privateFonts.Families[1], 14, FontStyle.Italic);
-            nameTest1.BackColor = Color.FromArgb(254, 242, 239); // установка цвета
+            nameTest1.BackColor = Color.FromArgb(234, 190, 243); // установка цвета
+
             nameTest1.BringToFront();
 
             this.Controls.Add(nameTest1);
 
+            this.Controls.SetChildIndex(test1, 1000);
             this.Controls.SetChildIndex(test11, 0);
             this.Controls.SetChildIndex(nameTest1, 0);
-            this.Controls.SetChildIndex(test1, 1000);
 
             // анимация
             originalY = test11.Top;
