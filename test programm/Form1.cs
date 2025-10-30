@@ -1,3 +1,4 @@
+using System.Data.SQLite;
 using System.Drawing.Text;
 using System.Runtime.InteropServices;
 
@@ -45,6 +46,9 @@ namespace test_programm
 
         public Form1()
         {
+            // подключение БД
+            CreateDatabaseAndtable();
+
             InitializeComponent();
             LoadCustomFont();
 
@@ -67,8 +71,6 @@ namespace test_programm
             OnOffPassingTheTest(false);
 
 
-
-
             this.Size = new Size(isForm, 900);
 
             Panel panel = new Panel()
@@ -87,6 +89,52 @@ namespace test_programm
 
             this.BackColor = Color.FromArgb(255, 250, 247); // установка цвета
 
+
+            // Подпишитесь на события кликов
+            answer1.Click += (sender, e) => { isAnswer1Clicked = true; };
+            answer2.Click += (sender, e) => { isAnswer2Clicked = true; };
+            answer3.Click += (sender, e) => { isAnswer3Clicked = true; };
+
+        }
+
+        //создание БД для пользователя
+        private static void CreateDatabaseAndtable()
+        {
+            using (var connection = new SQLiteConnection("Data Source = Test.db"))
+            {
+                connection.Open();
+                string createTableSql = @"
+                    CREATE TABLE IF NOT EXISTS LoginPassword (
+	                    ID	INTEGER NOT NULL,
+	                    Name_User	TEXT NOT NULL,
+	                    Login_User	TEXT NOT NULL UNIQUE,
+	                    Password_User	TEXT NOT NULL UNIQUE,
+	                    PRIMARY KEY(ID AUTOINCREMENT));
+                    CREATE TABLE IF NOT EXISTS Cataloge (
+	                    ID_Cat	INTEGER NOT NULL,
+	                    Thema	TEXT NOT NULL,
+	                    PRIMARY KEY(ID_Cat AUTOINCREMENT));
+                    CREATE TABLE IF NOT EXISTS Question (
+	                    ID_Quest	INTEGER NOT NULL,
+	                    Quest	TEXT NOT NULL,
+	                    ID_Cat	INTEGER NOT NULL,
+	                    PRIMARY KEY(ID_Quest AUTOINCREMENT),
+	                    FOREIGN KEY(ID_Cat) REFERENCES Cataloge(ID_Cat));
+                    CREATE TABLE IF NOT EXISTS Answer (
+	                    ID_Ans	INTEGER NOT NULL,
+	                    Answ_Option	TEXT NOT NULL,
+	                    ID_Ques	INTEGER NOT NULL,
+	                    PRIMARY KEY(ID_Ans AUTOINCREMENT));
+                    CREATE TABLE IF NOT EXISTS RightAnswer (
+	                    ID	INTEGER NOT NULL,
+	                    ID_Quest	INTEGER NOT NULL,
+	                    RAnsw	TEXT NOT NULL,
+	                    PRIMARY KEY(ID AUTOINCREMENT))";
+                using (var command = new SQLiteCommand(createTableSql, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
 
@@ -1579,11 +1627,14 @@ namespace test_programm
 
         // страница ВЫБОР ТЕСТА
         PictureBox ReturnSelectionTest = new PictureBox();       //возврат в главную теста
-        //PictureBox ButtonStr0 = new PictureBox();
-        //PictureBox ButtonStr1 = new PictureBox();
-        //PictureBox ButtonStr2 = new PictureBox();
-        //PictureBox ButtonStr3 = new PictureBox();
-        //PictureBox ButtonStr4 = new PictureBox();
+
+        private List<string> currentQuestions;
+        private List<string> currentAnswers;
+        private List<string> currentRightAnswers;
+        private int currentQuestionIndex = 0;
+        private bool isAnswer1Clicked = false;
+        private bool isAnswer2Clicked = false;
+        private bool isAnswer3Clicked = false;
 
         PictureBox fonSelectionTest = new PictureBox();
         PictureBox fonSelectionTest2 = new PictureBox();
@@ -1593,8 +1644,9 @@ namespace test_programm
 
         PictureBox test1 = new PictureBox();
         PictureBox test11 = new PictureBox();
-        //Label nameTest1 = new Label();
-        RichTextBox nameTest1 = new RichTextBox();
+        Label nameTest1 = new Label();
+
+
 
         PictureBox test2 = new PictureBox();
         PictureBox test21 = new PictureBox();
@@ -1655,10 +1707,29 @@ namespace test_programm
                 }
             }
 
+            foreach (Control control in this.Controls)
+            {
+                string tekst = "";
+                if (control is Label box)
+                {
+                    tekst = box.Tag?.ToString();
+                    if (!string.IsNullOrEmpty(tekst))
+                    {
+                        if (tekst.Split("nameTestSelect").Length > 0)
+                        {
+                            box.Enabled = isOn;
+                            box.Visible = isOn;
+                        }
+
+                    }
+
+                }
+            }
+
         }
 
-        private int originalY; // Исходная координата Y
-        private int originalX; // Исходная координата X
+        private int originalY;  // Исходная координата Y
+        private int originalX;  // Исходная координата X
         private int targetY;    // Целевая координата Y (вверх)
         private int targetX;    // Целевая координата X (влево)
         private bool isAnimatingVertically = false;
@@ -1794,6 +1865,16 @@ namespace test_programm
 
             this.Controls.Add(test1);
 
+            //nameTest1.Text = "Math Primers Level 1";
+            //nameTest1.Location = new Point(60, 275);
+            //nameTest1.Name = "nameTest";
+            //nameTest1.MaximumSize = new Size(150, 150);         // Сделать перенос на следующую строку
+            //nameTest1.Font = new Font(privateFonts.Families[1], 12, FontStyle.Italic);
+            //nameTest1.BackColor = Color.FromArgb(234, 190, 243); // установка цвета
+            //nameTest1.BringToFront();
+
+            //this.Controls.Add(nameTest1);
+
             test11.Location = new Point(56, 168);
             test11.Name = "test11";
             test11.Size = new Size(110, 110);
@@ -1801,29 +1882,12 @@ namespace test_programm
             test11.TabIndex = 0;
             test11.Image = Image.FromFile("object/MathPrimers1.png");
             test11.BringToFront();
+            test11.Tag = "nameTestSelect row1 cow1";
 
             this.Controls.Add(test11);
-
-            nameTest1.Text = "Math Primers Level 1";
-            nameTest1.Location = new Point(60, 265);
-            nameTest1.Name = "nameTest";
-            nameTest1.MaximumSize = new Size(150, 60);         // Сделать перенос на следующую строку
-            nameTest1.BorderStyle = BorderStyle.None; // Убираем рамку, чтобы выглядело как Label
-            nameTest1.ReadOnly = true;
-            nameTest1.Font = new Font(privateFonts.Families[1], 12, FontStyle.Italic);
-            nameTest1.BackColor = Color.FromArgb(234, 190, 243); // установка цвета
-            nameTest1.Rtf = @"{\rtf1\ansi\deff0 {\fonttbl {\f0 " + privateFonts.Families[1].Name + @";}}"
-                            + @"\fs22\i" // 12t и курсив
-                            + @"\sl00" // 300 твипов = ~0.21 дюйма (межстрочный интервал)
-                            + @"Math Primers\line Level 1}";
-            HideCaret(nameTest1.Handle);
-            nameTest1.BringToFront();
-
-            this.Controls.Add(nameTest1);
-
             this.Controls.SetChildIndex(test1, 1000);
             this.Controls.SetChildIndex(test11, 0);
-            this.Controls.SetChildIndex(nameTest1, 0);
+            //this.Controls.SetChildIndex(nameTest1, 0);
 
             // анимация
             originalY = test11.Top;
@@ -1871,8 +1935,36 @@ namespace test_programm
                 OnOffPassingTheTest(true);
             };
 
-            // кнопка переключение страниц
+            // получение списка тестов
 
+            int testCount = ValidateCatalogeCount();
+            List<string> list = ValidateCataloge();
+
+            for (int i = 0; i < testCount; i++)
+            {
+                Label nameTestSelect = new Label();
+                nameTestSelect.Location = new Point(60 + i * 150 + 25 * i, 265);
+                nameTestSelect.Name = "nameTestSelect" + i;
+                nameTestSelect.MaximumSize = new Size(75, 90);
+                nameTestSelect.TabIndex = 0;
+                nameTestSelect.Tag = "nameTestSelect row1 cow" + i;  //имя + строка и стоблец
+                nameTestSelect.Font = new Font(privateFonts.Families[1], 12, FontStyle.Italic);
+                nameTestSelect.BackColor = Color.FromArgb(234, 190, 243); // установка цвета
+                nameTestSelect.BringToFront();
+
+                nameTestSelect.Text = list[i];
+
+                if (i == 0)
+                {
+                    nameTestSelect.Tag = 1;
+
+                }
+
+                this.Controls.Add(nameTestSelect);
+                this.Controls.SetChildIndex(nameTestSelect, 0);
+
+                //nameTestSelect.Text += ClickTest;
+            }
 
             for (int i = 0; i < 5; i++)
             {
@@ -1899,6 +1991,29 @@ namespace test_programm
             }
 
 
+        }
+
+
+        private int ValidateCatalogeCount()
+        {
+            int count = 0;
+            using (var connection = new SQLiteConnection("Data Source = Test.db"))
+            {
+                connection.Open();
+                string selectCataloge = "SELECT Thema FROM Cataloge";
+                using (var command = new SQLiteCommand(selectCataloge, connection))
+                {
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            count++;
+                        }
+                    }
+                }
+
+            }
+            return count;
         }
 
         private void ClickStr(object sender, EventArgs e)
@@ -1933,7 +2048,10 @@ namespace test_programm
         Label nameUserPassingTheTest = new Label();             //имя логина
 
         Label testThema = new Label();                          //тема
-        Label testThemaName = new Label();                      //название темы
+        //Label testThemaName = new Label();                      //название темы
+        ComboBox testThemaName = new ComboBox();
+        //Button button = new Button();
+
 
         Label testNumQuestion = new Label();                    //следующий вопрос
         Label testNumQuest = new Label();                       //слеш
@@ -1973,6 +2091,235 @@ namespace test_programm
             nameUserPassingTheTest.Enabled = isOn; nameUserPassingTheTest.Visible = isOn;
         }
 
+        //чтение из БД Каталога тем
+        private static List<string> ValidateCataloge()
+        {
+            List<string> list = new List<string>();
+            using (var connection = new SQLiteConnection("Data Source = Test.db"))
+            {
+                connection.Open();
+                string selectCataloge = "SELECT Thema FROM Cataloge";
+                using (var command = new SQLiteCommand(selectCataloge, connection))
+                {
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            list.Add(reader.GetString(0));
+                        }
+                    }
+                }
+
+            }
+            return list;
+        }
+
+        // обработчик события для изменения выбранной темы
+        private void testThemaName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string thema = testThemaName.SelectedItem?.ToString();
+            if (!string.IsNullOrEmpty(thema))
+            {
+                currentQuestions = GetQuestionsByThema(thema); // Инициализация списка вопросов
+                currentQuestionIndex = 0; // Сброс индекса
+                ShowNextQuestion(); // Показать первый вопрос
+
+            }
+        }
+
+        //получить количество вопросов на заданную тему
+        public int ValidateCountToThema(string thema)
+        {
+            int count = 0;
+            using (var connection = new SQLiteConnection("Data Source = Test.db"))
+            {
+                connection.Open();
+                string selectCataloge = "SELECT COUNT() FROM Question INNER JOIN Cataloge ON Question.ID_Cat = Cataloge.ID_Cat WHERE Cataloge.Thema = @thema";
+                using (var command = new SQLiteCommand(selectCataloge, connection))
+                {
+                    command.Parameters.AddWithValue("@thema", thema);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            count = reader.GetInt32(0);
+                        }
+                    }
+                }
+
+            }
+
+            return count;
+        }
+
+        //получение списка вопросов
+        private static List<string> GetQuestionsByThema(string thema)
+        {
+            List<string> questions = new List<string>();
+            using (var connection = new SQLiteConnection("Data Source = Test.db"))
+            {
+                connection.Open();
+                string selectQuestions = @"SELECT Question.Quest FROM Question INNER JOIN Cataloge ON Question.ID_Cat = Cataloge.ID_Cat
+                                            WHERE Cataloge.Thema = @thema";
+                using (var command = new SQLiteCommand(selectQuestions, connection))
+                {
+                    command.Parameters.AddWithValue("@thema", thema);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            questions.Add(reader.GetString(0));
+                            int a = 0;
+                        }
+                    }
+                }
+            }
+
+            return questions;
+        }
+
+        //получение списка ответов
+        private static List<string> GetAnswerByThema(string thema, string question)
+        {
+            List<string> answer = new List<string>();
+            using (var connection = new SQLiteConnection("Data Source = Test.db"))
+            {
+                connection.Open();
+                string selectQuestions = @"SELECT Answer.Answ_Option 
+                                            FROM Question, Answer 
+                                            INNER JOIN Cataloge ON Question.ID_Cat = Cataloge.ID_Cat
+                                            WHERE Cataloge.Thema = @thema AND Answer.ID_Ques = Question.ID_Quest
+                                            AND Question.Quest = @question";
+                using (var command = new SQLiteCommand(selectQuestions, connection))
+                {
+                    command.Parameters.AddWithValue("@thema", thema);
+                    command.Parameters.AddWithValue("@question", question);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            answer.Add(reader.GetString(0));
+                        }
+                    }
+                }
+            }
+
+            return answer;
+        }
+
+        //получить правильный ответ
+        private static List<string> GetRightAnswerByThema(string thema, string question)
+        {
+            List<string> RAnswer = new List<string>();
+            using (var connection = new SQLiteConnection("Data Source = Test.db"))
+            {
+                connection.Open();
+                string selectQuestions = @"SELECT RightAnswer.RAnsw
+                                            FROM Question
+                                            INNER JOIN Cataloge ON Question.ID_Cat = Cataloge.ID_Cat
+                                            INNER JOIN Answer ON Answer.ID_Ques = Question.ID_Quest
+                                            INNER JOIN RightAnswer ON RightAnswer.RAnsw = Answer.Answ_Option
+                                            WHERE Cataloge.Thema = @thema AND Question.Quest = @question";
+                using (var command = new SQLiteCommand(selectQuestions, connection))
+                {
+                    command.Parameters.AddWithValue("@thema", thema);
+                    command.Parameters.AddWithValue("@question", question);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            RAnswer.Add(reader.GetString(0));
+                        }
+                    }
+                }
+            }
+
+            return RAnswer;
+        }
+
+        //показ следующего вопроса
+        private void ShowNextQuestion()
+        {
+            if (currentQuestionIndex < currentQuestions.Count)
+            {
+                string question = currentQuestions[currentQuestionIndex];
+                currentAnswers = GetAnswerByThema(testThemaName.SelectedItem.ToString(), question);
+                currentRightAnswers = GetRightAnswerByThema(testThemaName.SelectedItem.ToString(), question);
+
+                // Обновление порядкового номера вопроса
+                testNumQuestion.Text = (currentQuestionIndex + 1).ToString();
+                testNumQuestionAll.Text = currentQuestions.Count.ToString(); // Общее количество вопросов
+
+                // Обновление текста вопроса
+                testQuestionName.Text = question;
+
+                // Обновление вариантов ответов
+                testAnswer1.Text = currentAnswers.Count > 0 ? currentAnswers[0] : string.Empty;
+                testAnswer2.Text = currentAnswers.Count > 1 ? currentAnswers[1] : string.Empty;
+                testAnswer3.Text = currentAnswers.Count > 2 ? currentAnswers[2] : string.Empty;
+            }
+            else
+            {
+                MessageBox.Show("Тест завершен.");
+            }
+        }
+
+
+
+        private void btn_Answ_Click(object sender, EventArgs e)
+        {
+            if (currentQuestionIndex < currentQuestions.Count)
+            {
+                List<string> selectedAnswers = new List<string>();
+                if (isAnswer1Clicked)
+                {
+                    selectedAnswers.Add(testAnswer1.Text);
+                    isAnswer1Clicked = false; // Сбросить флаг
+                }
+                if (isAnswer2Clicked)
+                {
+                    selectedAnswers.Add(testAnswer2.Text);
+                    isAnswer2Clicked = false; // Сбросить флаг
+                }
+                if (isAnswer3Clicked)
+                {
+                    selectedAnswers.Add(testAnswer3.Text);
+                    isAnswer3Clicked = false; // Сбросить флаг
+                }
+
+                bool allCorrect = true;
+                foreach (var answer in selectedAnswers)
+                {
+                    if (!currentRightAnswers.Contains(answer))
+                    {
+                        allCorrect = false;
+                        break;
+                    }
+                }
+
+                //// Логика для проверки правильности ответов
+                //if (allCorrect)
+                //{
+                //    // Отображение правильных ответов
+                //    if (currentRightAnswers.Count > 0)
+                //    {
+                //        label_RAnsw1.Text = currentRightAnswers[0];
+                //    }
+                //    if (currentRightAnswers.Count > 1)
+                //    {
+                //        label_RAnsw2.Text = currentRightAnswers[1];
+                //    }
+                //    MessageBox.Show("Правильный ответ!");
+                //}
+                //else
+                //{
+                //    MessageBox.Show("Неправильный ответ.");
+                //}
+
+                currentQuestionIndex++;
+                ShowNextQuestion();
+            }
+        }
 
         private void PassingTheTest()
         {
@@ -2102,6 +2449,49 @@ namespace test_programm
 
             this.Controls.Add(testThemaName);
 
+            testThemaName.DropDownStyle = ComboBoxStyle.DropDownList;
+            // получение всех тем из каталога
+            List<string> catalogeItems = ValidateCataloge();
+            testThemaName.Items.AddRange(catalogeItems.ToArray());
+
+            // обработчик события для изменения выбранной темы
+            testThemaName.SelectedIndexChanged += testThemaName_SelectedIndexChanged;
+
+            //button.Location = new Point(768, 121);
+            //button.Name = "but";
+            //button.Size = new Size(50, 50);
+            //button.BackColor = Color.FromArgb(179, 206, 251); // установка цвета
+            //button.TabIndex = 0;
+
+            //this.Controls.Add(button);
+            //this.Controls.SetChildIndex(button, 0);
+
+            ReturnPassingTheTest.Click += (sender, e) =>
+            {
+                string thema = testThemaName.SelectedItem?.ToString();
+                if (!string.IsNullOrEmpty(thema))
+                {
+                    int count = ValidateCountToThema(thema);
+                    testNumQuestionAll.Text = count.ToString();
+
+                    currentQuestions = GetQuestionsByThema(thema); //получение списка вопросов по теме
+
+                    if (currentQuestions.Count > 0)
+                    {
+                        currentQuestionIndex = 0;
+                        ShowNextQuestion();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Нет вопросов для выбранной темы.");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Выберите тему для теста");
+                }
+            };
+
             //номер вопроса
             testNumQuestion.Text = "...";
             testNumQuestion.Location = new Point(44, 185);
@@ -2161,6 +2551,9 @@ namespace test_programm
             this.Controls.SetChildIndex(testNumQuestionAll, 0);
             this.Controls.SetChildIndex(testQuestion, 0);
             this.Controls.SetChildIndex(testQuestionName, 0);
+
+
+
 
             // checkBox 1
             answer1.Location = new Point(75, 710);
